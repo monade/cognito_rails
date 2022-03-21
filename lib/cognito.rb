@@ -142,10 +142,8 @@ module Cognito extend ActiveSupport::Concern
     end
   end
 
-  module ClassMethods
-    def cognito_debug
-      puts "COGNITO DEBUG"
-    end
+  included do
+    before_save do puts "FROM GEM"
   end
 
 end

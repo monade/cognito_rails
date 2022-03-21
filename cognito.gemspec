@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://rubygems.org/gems/monade-cognito'
   s.license     = 'MIT'
   s.add_dependency 'activesupport', ['>= 5', '< 8']
+  s.add_dependency 'aws-sdk-s3', require: false
+  s.add_dependency 'aws-sdk-cognitoidentityprovider'
   s.add_development_dependency 'rspec', '~> 3'
   s.add_development_dependency 'rubocop'
 end
