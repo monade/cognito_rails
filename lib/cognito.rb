@@ -141,7 +141,6 @@ module Cognito extend ActiveSupport::Concern
 
   module Initializer
     def as_cognito_user
-      puts "INITIALIZER"
       send :include, Cognito
     end
   end
