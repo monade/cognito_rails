@@ -1,3 +1,5 @@
+require 'active_support/concern'
+
 # cognito_concern.rb
 module CognitoConcern
   extend ActiveSupport::Concern
