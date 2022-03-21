@@ -148,7 +148,7 @@ module Cognito
     end
 
     def init_cognito_user
-      next if external_id.present?
+      return if external_id.present?
   
       cognito_user = CognitoUser.new(email:)
       cognito_user.save!
