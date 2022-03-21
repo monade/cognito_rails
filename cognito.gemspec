@@ -3,7 +3,7 @@ require 'cognito/version'
 
 Gem::Specification.new do |s|
   s.name = 'cognito'
-  s.version = Cognito.VERSION
+  s.version = Cognito::VERSION
   s.summary = 'Add Cognito authentication to your Rails API'
   s.description = 'Add Cognito authentication to your Rails API'
   s.authors = ['Mònade']
