@@ -136,13 +136,12 @@ end
 module Cognito
   extend ActiveSupport::Concern
 
-  # included do
-  #   before_save do puts "FROM GEM"
-  # end
+  included do
+    before_save puts "FROM GEM"
+  end
 
   module Initializer
     def as_cognito_user
-      puts "INITIALIZER"
 			send :include, Cognito
 		end
 	end
