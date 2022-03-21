@@ -131,13 +131,17 @@ class CognitoUser
   end
 end
 
-# module Cognito
+module Cognito extend ActiveSupport::Concern
 
-#   module Initializer
-#     def as_cognito_user
-#       send :include, Cognito
-#     end
-#   end
+  module Initializer
+    def as_cognito_user
+      send :include, Cognito
+    end
+  end
 
-# end
-# ActiveRecord::Base.send :extend, Cognito::Initializer
+  included do
+    before_save do puts "FROM GEM"
+  end
+
+end
+ActiveRecord::Base.send :extend, Cognito::Initializer
