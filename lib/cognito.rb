@@ -142,6 +142,7 @@ module Cognito
 
   module Initializer
     def as_cognito_user
+      puts "INITIALIZER"
 			send :include, Cognito
 		end
 	end
