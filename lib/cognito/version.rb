@@ -1,3 +1,3 @@
 module Cognito
-  VERSION = '0.0.0-dev'
+  VERSION = '0.0.2-dev'
 end
