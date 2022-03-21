@@ -1,3 +1,4 @@
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 require 'cognito/version'
 
 Gem::Specification.new do |s|
