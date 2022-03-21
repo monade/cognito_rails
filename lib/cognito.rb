@@ -136,8 +136,8 @@ end
 module Cognito
   extend ActiveSupport::Concern
 
-  included do
-    before_save puts "FROM GEM"
+  self.included do |base|
+    base.before_save puts "FROM GEM"
   end
 
   module Initializer
