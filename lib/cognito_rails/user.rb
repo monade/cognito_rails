@@ -1,4 +1,4 @@
-class CognitoUser
+class CognitoRails::User
   include ActiveModel::Validations
 
   attr_accessor :id, :email, :password
@@ -9,10 +9,6 @@ class CognitoUser
     attributes = attributes.with_indifferent_access
     self.email = attributes[:email]
     self.password = SecureRandom.urlsafe_base64 || attributes[:password]
-  end
-
-  def user
-    @user ||= User.find_by(external_id: id)
   end
 
   def self.find(id)

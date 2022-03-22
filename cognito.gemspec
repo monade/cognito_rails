@@ -1,8 +1,8 @@
 $LOAD_PATH.push File.expand_path('lib', __dir__)
-require 'cognito/version'
+require 'cognito_rails/version'
 
 Gem::Specification.new do |s|
-  s.name = 'cognito'
+  s.name = 'cognito_rails'
   s.version = Cognito::VERSION
   s.summary = 'Add Cognito authentication to your Rails API'
   s.description = 'Add Cognito authentication to your Rails API'

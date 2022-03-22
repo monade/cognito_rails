@@ -1,4 +1,4 @@
-module CognitoConcern
+module CognitoRails::ControllerConcern
   extend ActiveSupport::Concern
 
   def current_user

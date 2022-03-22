@@ -1,18 +1,18 @@
 require 'active_support/concern'
-require 'cognito/cognito_concern'
-require 'cognito/cognito_user'
+require 'cognito_rails/controller_concern'
+require 'cognito_rails/user'
 
-module Cognito
+module CognitoRails
   extend ActiveSupport::Concern
   
   def cognito_user
-    @cognito_user ||= CognitoUser.find(external_id)
+    @cognito_user ||= User.find(external_id)
   end
 
   def init_cognito_user
     return if external_id.present?
 
-    cognito_user = CognitoUser.new(email:)
+    cognito_user = User.new(email:)
     cognito_user.save!
     self.external_id = cognito_user.id
   end
@@ -23,8 +23,8 @@ module Cognito
 
   module Initializer
     def as_cognito_user
-			send :include, Cognito
+			send :include, CognitoRails
 		end
 	end
 end
-ActiveRecord::Base.send :extend, Cognito::Initializer
+ActiveRecord::Base.send :extend, CognitoRails::Initializer

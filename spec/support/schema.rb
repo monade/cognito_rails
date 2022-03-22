@@ -6,7 +6,7 @@ ActiveRecord::Base.establish_connection(
 )
 
 class User < ActiveRecord::Base
-  validates :email, :role, presence: true
+  validates :email, presence: true
   validates :email, uniqueness: true
 
   as_cognito_user

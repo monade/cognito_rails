@@ -1,7 +1,7 @@
 require 'active_support'
-require 'active_record'
-require 'cognito'
 require 'rspec'
+require 'active_record'
+require 'cognito_rails'
 
 I18n.enforce_available_locales = false
 RSpec::Expectations.configuration.warn_about_potential_false_positives = false
