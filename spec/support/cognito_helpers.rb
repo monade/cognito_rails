@@ -1,4 +1,4 @@
-module CognitoHelpers
+module CognitoRails::Helpers
   extend ActiveSupport::Concern
 
   included do

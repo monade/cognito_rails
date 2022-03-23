@@ -14,7 +14,7 @@ class CognitoRails::User
   def self.find(id)
     result = cognito_client.admin_get_user(
       {
-        user_pool_id: credentials[:user_pool_id], # required
+        user_pool_id: CognitoRails::Config.aws_user_pool_id, # required
         username: id # required
       }
     )
@@ -54,7 +54,7 @@ class CognitoRails::User
 
     resp = cognito_client.admin_create_user(
       {
-        user_pool_id: credentials[:user_pool_id], # required
+        user_pool_id: CognitoRails::Config.aws_user_pool_id, # required
         username: email, # required
         temporary_password: password, # required
         user_attributes: [
@@ -79,7 +79,7 @@ class CognitoRails::User
 
     cognito_client.admin_delete_user(
       {
-        user_pool_id: credentials[:user_pool_id],
+        user_pool_id: CognitoRails::Config.aws_user_pool_id,
         username: id
       }
     )
@@ -102,17 +102,9 @@ class CognitoRails::User
     raise 'Can\'t create user in test mode' if Rails.env.test?
 
     @cognito_client ||= Aws::CognitoIdentityProvider::Client.new(
-      access_key_id: credentials[:access_key_id],
-      secret_access_key: credentials[:secret_access_key],
-      region: credentials[:region]
+      access_key_id: CognitoRails::Config.aws_access_key_id,
+      secret_access_key: CognitoRails::Config.aws_secret_access_key,
+      region: CognitoRails::Config.aws_region
     )
-  end
-
-  def credentials
-    self.class.credentials
-  end
-
-  def self.credentials
-    Rails.application.credentials[:cognito] || {}
   end
 end

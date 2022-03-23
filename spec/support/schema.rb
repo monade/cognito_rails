@@ -32,6 +32,5 @@ module Schema
       end
     end
 
-    user = User.create!(email: 'e@mail.com', external_id: 'externalid-0')
   end
 end

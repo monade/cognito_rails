@@ -1,16 +1,9 @@
 require 'spec_helper'
 
-RSpec.describe CognitoUser, type: :model do
-  include CognitoHelpers
+RSpec.describe CognitoRails::User, type: :model do
+  include CognitoRails::Helpers
 
   let(:sample_cognito_email) { 'some@mail.com' }
-
-  it '#user returns a linked user' do
-    mock = CognitoUser.new
-    mock.id = '123123'
-    user = create(:user, external_id: mock.id)
-    expect(mock.user).to eq(user)
-  end
 
   it 'validates email presence' do
     expect(subject).to have(1).error_on(:email)
@@ -22,7 +15,7 @@ RSpec.describe CognitoUser, type: :model do
     expect(described_class).to receive(:cognito_client).and_return(fake_cognito_client)
 
     record = described_class.find(sample_cognito_id)
-    expect(record).to be_a(CognitoUser)
+    expect(record).to be_a(described_class)
     expect(record.id).to eq(sample_cognito_id)
     expect(record.email).to eq(sample_cognito_email)
   end
@@ -51,6 +44,26 @@ RSpec.describe CognitoUser, type: :model do
 
     it 'fails save on invalid record' do
       expect { subject.destroy! }.to raise_error ActiveRecord::RecordInvalid
+    end
+  end
+
+  context 'user' do
+    include CognitoRails::Helpers
+
+    it 'creates a cognito user once created a new user' do
+      expect_any_instance_of(CognitoRails::User).to receive(:cognito_client).and_return(fake_cognito_client)
+
+      user = User.create!(email: sample_cognito_email)
+
+      expect(user.external_id).to eq(sample_cognito_id)
+    end
+
+    it 'destroys the cognito user once destroyed the user' do
+      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+
+      user = User.create!(email: sample_cognito_email)
+
+      user.destroy!
     end
   end
 end
