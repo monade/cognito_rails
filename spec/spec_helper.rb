@@ -16,10 +16,6 @@ CognitoRails::Config.aws_access_key_id = 'access_key_id'
 CognitoRails::Config.aws_region = 'region'
 CognitoRails::Config.aws_secret_access_key = 'secret_access_key'
 CognitoRails::Config.aws_user_pool_id = 'user_pool_id'
-puts CognitoRails::Config.aws_access_key_id
-puts CognitoRails::Config.aws_region
-puts CognitoRails::Config.aws_secret_access_key
-puts CognitoRails::Config.aws_user_pool_id
 
 RSpec.configure do |config|
 
