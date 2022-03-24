@@ -1,8 +1,8 @@
 require 'active_support/concern'
 
-require '../cognito_rails/config'
-require '../cognito_rails/controller_concern'
-require '../cognito_rails/user'
+require 'cognito_rails/config'
+require 'cognito_rails/controller_concern'
+require 'cognito_rails/user'
 
 module CognitoRails
   extend ActiveSupport::Concern
