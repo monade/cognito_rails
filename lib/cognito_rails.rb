@@ -1,6 +1,8 @@
 require 'active_support/concern'
 
-Dir[File.expand_path('../cognito_rails/*.rb', __FILE__)].each { |f| require f }
+require './cognito_rails/config'
+require './cognito_rails/controller_concern'
+require './cognito_rails/user'
 
 module CognitoRails
   extend ActiveSupport::Concern
