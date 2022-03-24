@@ -10,14 +10,6 @@ class User < ActiveRecord::Base
   validates :email, uniqueness: true
 
   as_cognito_user
-
-  before_create do
-    init_cognito_user
-  end
-
-  after_destroy do
-    destroy_cognito_user
-  end
 end
 
 module Schema
