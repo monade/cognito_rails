@@ -4,6 +4,7 @@ RSpec.describe CognitoRails::User, type: :model do
   include CognitoRails::Helpers
 
   let(:sample_cognito_email) { 'some@mail.com' }
+  let(:sample_cognito_phone) { '123456789' }
 
   it 'validates email presence' do
     expect(subject).to have(1).error_on(:email)
@@ -18,6 +19,22 @@ RSpec.describe CognitoRails::User, type: :model do
     expect(record).to be_a(described_class)
     expect(record.id).to eq(sample_cognito_id)
     expect(record.email).to eq(sample_cognito_email)
+    expect(record.user_class).to eq(User)
+  end
+
+  it 'finds a user with admin class' do
+    expect(described_class).to receive(:cognito_client).and_return(fake_cognito_client)
+
+    record = described_class.find(sample_cognito_id, Admin)
+    expect(record.user_class).to eq(Admin)
+  end
+
+  it 'finds a user with default class' do
+    expect(described_class).to receive(:cognito_client).and_return(fake_cognito_client)
+
+    record = described_class.find(sample_cognito_id)
+    expect(record.user_class).to eq(CognitoRails::Config.default_user_class.constantize)
+
   end
 
   context 'persistence' do
@@ -65,5 +82,11 @@ RSpec.describe CognitoRails::User, type: :model do
 
       user.destroy!
     end
+  end
+
+  context 'admin' do
+  include CognitoRails::Helpers
+
+  
   end
 end

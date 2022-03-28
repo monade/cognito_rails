@@ -32,6 +32,14 @@ module CognitoRails
       def aws_user_pool_id=(value)
         @aws_user_pool_id = value
       end
+
+      def default_user_class
+        @default_user_class || (raise RuntimeError, 'Missing config default_user_class')
+      end
+
+      def default_user_class=(value)
+        @default_user_class = value
+      end
     end
   end
 end

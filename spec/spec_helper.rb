@@ -16,6 +16,7 @@ CognitoRails::Config.aws_access_key_id = 'access_key_id'
 CognitoRails::Config.aws_region = 'region'
 CognitoRails::Config.aws_secret_access_key = 'secret_access_key'
 CognitoRails::Config.aws_user_pool_id = 'user_pool_id'
+CognitoRails::Config.default_user_class = 'User'
 
 RSpec.configure do |config|
 
@@ -24,7 +25,6 @@ RSpec.configure do |config|
   config.before(:suite) do
     Schema.create
   end
-
 
   config.around(:each) do |example|
     ActiveRecord::Base.transaction do

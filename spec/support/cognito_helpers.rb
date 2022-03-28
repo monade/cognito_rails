@@ -4,6 +4,7 @@ module CognitoRails::Helpers
   included do
     let(:sample_cognito_id) { SecureRandom.uuid }
     let(:sample_cognito_email) { 'some@mail.com' }
+    let(:sample_cognito_phone) { '123456789' }
     let(:fake_cognito_client) do
       client = double
       allow(client).to receive(:admin_create_user) do |params|
@@ -29,7 +30,8 @@ module CognitoRails::Helpers
             username: sample_cognito_id,
             user_attributes: [
               { name: 'sub', value: sample_cognito_id },
-              { name: 'email', value: sample_cognito_email }
+              { name: 'email', value: sample_cognito_email },
+              { name: 'phone', value: sample_cognito_phone }
             ]
           }
         )
