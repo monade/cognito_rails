@@ -41,6 +41,7 @@ module Schema
 
       create_table :admins, force: true do |t|
         t.string "email", null: false
+        t.string "phone", null: false
         t.string "external_id", null: false
         t.timestamps null: false
       end
