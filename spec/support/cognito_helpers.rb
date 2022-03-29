@@ -31,7 +31,8 @@ module CognitoRails::Helpers
             user_attributes: [
               { name: 'sub', value: sample_cognito_id },
               { name: 'email', value: sample_cognito_email },
-              { name: 'phone', value: sample_cognito_phone }
+              { name: 'phone', value: sample_cognito_phone },
+              { name: 'custom:name', value: "TestName" }
             ]
           }
         )

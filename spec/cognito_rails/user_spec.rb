@@ -82,6 +82,19 @@ RSpec.describe CognitoRails::User, type: :model do
 
       user.destroy!
     end
+
+    it 'saves custom attributes in cognito' do
+      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+
+      expect(fake_cognito_client).to receive(:admin_create_user).with(hash_including(
+        user_attributes: array_including([
+          { name: "custom:role", value: "user" },
+          { name: "custom:name", value: "TestName" }
+        ])
+      ))
+
+      user = User.create!(email: sample_cognito_email, name: 'TestName')
+    end
   end
 
   context 'admin' do

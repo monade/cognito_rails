@@ -2,7 +2,7 @@ module CognitoRails
   class User
     include ActiveModel::Validations
 
-    attr_accessor :id, :email, :password, :phone, :user_class
+    attr_accessor :id, :email, :password, :phone, :custom_attributes, :user_class
 
     validates :email, presence: true
 
@@ -12,6 +12,7 @@ module CognitoRails
       self.password = SecureRandom.urlsafe_base64 || attributes[:password]
       self.phone = attributes[:phone]
       self.user_class = attributes[:user_class] || Config.default_user_class.constantize
+      self.custom_attributes = attributes[:custom_attributes]
     end
 
     def self.find(id, user_class = nil)
@@ -95,10 +96,6 @@ module CognitoRails
       self.user_class._cognito_verify_phone
     end
 
-    def custom_attributes
-      self.user_class._cognito_attributes
-    end
-
     def self.cognito_client
       raise 'Can\'t create user in test mode' if Rails.env.test?
 
@@ -110,7 +107,6 @@ module CognitoRails
     end
 
     def general_user_attributes
-
       email_attributes = email.nil? ? [] : [
         {
           name: 'email',

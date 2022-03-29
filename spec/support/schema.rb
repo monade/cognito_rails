@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   as_cognito_user
   cognito_verify_email
   define_cognito_attribute 'role', 'user'
+  define_cognito_attribute 'name', :name
 end
 
 class Admin < ActiveRecord::Base
@@ -33,6 +34,7 @@ module Schema
     ActiveRecord::Schema.define do
       create_table :users, force: true do |t|
         t.string "email", null: false
+        t.string "name"
         t.string "external_id", null: false
         t.timestamps null: false
       end

@@ -16,8 +16,8 @@ module CognitoRails
   included do
     class_attribute :_cognito_verify_email
     class_attribute :_cognito_verify_phone
-    class_attribute :_cognito_attributes
-    self._cognito_attributes = Array.new
+    class_attribute :_cognito_custom_attributes
+    self._cognito_custom_attributes = Array.new
     
     before_create do
       self.init_cognito_user
@@ -39,9 +39,22 @@ module CognitoRails
 
     attrs = { email: , user_class: self.class }
     attrs[:phone] = phone if respond_to?(:phone)
+    attrs[:custom_attributes] = instance_custom_attributes
     cognito_user = User.new(attrs)
     cognito_user.save!
     self.external_id = cognito_user.id
+  end
+
+  def instance_custom_attributes
+    self._cognito_custom_attributes.map { |e| { name: e[:name], value: parse_custom_attribute_value(e[:value]) } }
+  end
+
+  def parse_custom_attribute_value value
+    if value.is_a? Symbol
+      self[value]
+    else
+      value
+    end
   end
 
   def destroy_cognito_user
@@ -58,7 +71,7 @@ module CognitoRails
     end
 
     def define_cognito_attribute(name, value)
-      self._cognito_attributes << { name: "custom:#{name}", value: value }
+      self._cognito_custom_attributes << { name: "custom:#{name}", value: value }
     end
 
   end
