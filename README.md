@@ -1,6 +1,6 @@
 ![Tests](https://github.com/monade/cognito_rails/actions/workflows/test.yml/badge.svg)
 
-# Solipsist
+# cognito_rails
 
 A gem to integrate AWS Cognito in your Rails app
 
