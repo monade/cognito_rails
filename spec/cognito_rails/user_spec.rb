@@ -12,7 +12,7 @@ RSpec.describe CognitoRails::User, type: :model do
     expect(subject).to have(0).error_on(:email)
   end
 
-  it 'finds an user by it' do
+  it 'finds an user by id' do
     expect(described_class).to receive(:cognito_client).and_return(fake_cognito_client)
 
     record = described_class.find(sample_cognito_id)
