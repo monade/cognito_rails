@@ -22,7 +22,7 @@ module CognitoRails
           username: id # required
         }
       )
-      user = new(user_class:)
+      user = new(user_class: user_class)
       user.id = result.username
       user.email = result.user_attributes.find { |attribute| attribute[:name] == 'email' }[:value]
       user.phone = result.user_attributes.find { |attribute| attribute[:name] == 'phone_number' }&.dig(:value)
