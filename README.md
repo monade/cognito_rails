@@ -12,6 +12,22 @@ Add the gem to your Gemfile
   gem 'cognito_rails', github: 'monade/cognito_rails'
 ```
 
+Add an initializer for the configuration
+
+```ruby
+cognito_credentials = if Rails.env.production?
+                        Rails.application.credentials&.dig(:cognito, :production)
+                      else
+                        Rails.application.credentials&.dig(:cognito, :staging)
+                      end
+
+CognitoRails::Config.aws_access_key_id = cognito_credentials&.dig(:access_key_id) || 'test'
+CognitoRails::Config.aws_region = cognito_credentials&.dig(:region) || 'test'
+CognitoRails::Config.aws_secret_access_key = cognito_credentials&.dig(:secret_access_key) || 'test'
+CognitoRails::Config.aws_user_pool_id = cognito_credentials&.dig(:user_pool_id) || 'test'
+CognitoRails::Config.default_user_class = 'User'
+```
+
 ## Controller
 
 Add the ControllerConcern to your ApplicationController:
