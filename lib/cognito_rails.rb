@@ -18,16 +18,16 @@ module CognitoRails
     class_attribute :_cognito_verify_phone
     class_attribute :_cognito_custom_attributes
     self._cognito_custom_attributes = Array.new
-    
+
     before_create do
       self.init_cognito_user
     end
-  
+
     after_destroy do
       self.destroy_cognito_user
     end
   end
-  
+
   def cognito_user
     @cognito_user ||= User.find(external_id, user_class: self.class)
   end
@@ -37,7 +37,7 @@ module CognitoRails
   def init_cognito_user
     return if external_id.present?
 
-    attrs = { email: , user_class: self.class }
+    attrs = { email: email, user_class: self.class }
     attrs[:phone] = phone if respond_to?(:phone)
     attrs[:custom_attributes] = instance_custom_attributes
     cognito_user = User.new(attrs)
