@@ -10,11 +10,11 @@ module CognitoRails
       self._cognito_custom_attributes = []
 
       before_create do
-        self.init_cognito_user
+        self.init_cognito_user unless CognitoRails::Config.skip_model_hooks
       end
 
       after_destroy do
-        self.destroy_cognito_user
+        self.destroy_cognito_user unless CognitoRails::Config.skip_model_hooks
       end
     end
 

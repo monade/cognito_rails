@@ -30,6 +30,7 @@ CognitoRails::Config.default_user_class = 'User'
 # Optional
 CognitoRails::Config.logger = Rails.logger # To receive logs
 CognitoRails::Config.cache_adapter = Rails.cache # To cache the JWT keys API call
+CognitoRails::Config.skip_model_hooks = Rails.env.test? # To skip cognito user creation during tests
 ```
 
 ## Controller

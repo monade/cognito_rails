@@ -9,6 +9,14 @@ module CognitoRails
         @aws_access_key_id = value
       end
 
+      def skip_model_hooks
+        !!@skip_model_hooks
+      end
+
+      def skip_model_hooks=(value)
+        @skip_model_hooks = value
+      end
+
       def logger
         @logger
       end
