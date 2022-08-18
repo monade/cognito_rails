@@ -1,4 +1,5 @@
 ![Tests](https://github.com/monade/cognito_rails/actions/workflows/test.yml/badge.svg)
+[![Gem Version](https://badge.fury.io/rb/cognito_rails.svg)](https://badge.fury.io/rb/cognito_rails)
 
 # cognito_rails
 
@@ -9,7 +10,7 @@ A gem to integrate AWS Cognito in your Rails app
 Add the gem to your Gemfile
 
 ```ruby
-  gem 'cognito_rails', github: 'monade/cognito_rails'
+  gem 'cognito_rails'
 ```
 
 Add an initializer for the configuration
@@ -26,6 +27,9 @@ CognitoRails::Config.aws_region = cognito_credentials&.dig(:region) || 'test'
 CognitoRails::Config.aws_secret_access_key = cognito_credentials&.dig(:secret_access_key) || 'test'
 CognitoRails::Config.aws_user_pool_id = cognito_credentials&.dig(:user_pool_id) || 'test'
 CognitoRails::Config.default_user_class = 'User'
+# Optional
+CognitoRails::Config.logger = Rails.logger # To receive logs
+CognitoRails::Config.cache_adapter = Rails.cache # To cache the JWT keys API call
 ```
 
 ## Controller
@@ -34,7 +38,7 @@ Add the ControllerConcern to your ApplicationController:
 
 ```ruby
 class ApplicationController < ActionController::Base
-  include CognitoRails::ControllerConcern
+  cognito_authentication user_class: 'User'
 end
 ```
 
@@ -66,3 +70,16 @@ end
 `:email` and `:phone` are automatically saved as Cognito attributes from the model.
 `cognito_verify_email` and `cognito_verify_phone` add email and phone verification on user creation.
 `define_cognito_attribute` assign a custom Cognito attribute to the user. **This won't work if you don't add the custom attribute through the Cognito console in advance**
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+About Monade
+----------------
+
+![monade](https://monade.io/wp-content/uploads/2021/06/monadelogo.png)
+
+cognito_rails is maintained by [mònade srl](https://monade.io/en/home-en/).
+
+We <3 open source software. [Contact us](https://monade.io/en/contact-us/) for your next project!
