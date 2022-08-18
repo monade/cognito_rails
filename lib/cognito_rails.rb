@@ -1,79 +1,29 @@
 require 'active_support/concern'
 
+require 'jwt'
+require 'open-uri'
 require 'cognito_rails/config'
-require 'cognito_rails/controller_concern'
+require 'cognito_rails/controller'
+require 'cognito_rails/model'
 require 'cognito_rails/user'
+require 'cognito_rails/jwt'
 
 module CognitoRails
   extend ActiveSupport::Concern
 
-  module Initializer
-    def as_cognito_user
-      send :include, CognitoRails
+  module ModelInitializer
+    def as_cognito_user(attribute_name: 'external_id')
+      send :include, CognitoRails::Model
+      self._cognito_attribute_name = attribute_name
     end
   end
 
-  included do
-    class_attribute :_cognito_verify_email
-    class_attribute :_cognito_verify_phone
-    class_attribute :_cognito_custom_attributes
-    self._cognito_custom_attributes = Array.new
-
-    before_create do
-      self.init_cognito_user
+  module ControllerInitializer
+    def cognito_authentication(user_class: nil)
+      send :include, CognitoRails::Controller
+      self._cognito_user_class = user_class
     end
-
-    after_destroy do
-      self.destroy_cognito_user
-    end
-  end
-
-  def cognito_user
-    @cognito_user ||= User.find(external_id, user_class: self.class)
-  end
-
-  protected
-
-  def init_cognito_user
-    return if external_id.present?
-
-    attrs = { email: email, user_class: self.class }
-    attrs[:phone] = phone if respond_to?(:phone)
-    attrs[:custom_attributes] = instance_custom_attributes
-    cognito_user = User.new(attrs)
-    cognito_user.save!
-    self.external_id = cognito_user.id
-  end
-
-  def instance_custom_attributes
-    self._cognito_custom_attributes.map { |e| { name: e[:name], value: parse_custom_attribute_value(e[:value]) } }
-  end
-
-  def parse_custom_attribute_value value
-    if value.is_a? Symbol
-      self[value]
-    else
-      value
-    end
-  end
-
-  def destroy_cognito_user
-    cognito_user&.destroy!
-  end
-
-  module ClassMethods
-    def cognito_verify_email
-      self._cognito_verify_email = true
-    end
-
-    def cognito_verify_phone
-      self._cognito_verify_phone = true
-    end
-
-    def define_cognito_attribute(name, value)
-      self._cognito_custom_attributes << { name: "custom:#{name}", value: value }
-    end
-
   end
 end
-ActiveRecord::Base.send :extend, CognitoRails::Initializer
+ActiveRecord::Base.send :extend, CognitoRails::ModelInitializer
+ActionController::Metal.send :extend, CognitoRails::ControllerInitializer

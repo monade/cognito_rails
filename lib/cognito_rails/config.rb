@@ -9,6 +9,22 @@ module CognitoRails
         @aws_access_key_id = value
       end
 
+      def logger
+        @logger
+      end
+
+      def logger=(value)
+        @logger = value
+      end
+
+      def cache_adapter
+        @cache_adapter
+      end
+
+      def cache_adapter=(value)
+        @cache_adapter = value
+      end
+
       def aws_region
         @aws_region || (raise RuntimeError, 'Missing config aws_region')
       end

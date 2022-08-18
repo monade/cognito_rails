@@ -21,7 +21,7 @@ class Admin < ActiveRecord::Base
   validates :phone, presence: true
   validates :phone, uniqueness: true
 
-  as_cognito_user
+  as_cognito_user attribute_name: 'cognito_id'
   cognito_verify_email
   cognito_verify_phone
   define_cognito_attribute 'role', 'admin'
@@ -42,7 +42,7 @@ module Schema
       create_table :admins, force: true do |t|
         t.string "email", null: false
         t.string "phone", null: false
-        t.string "external_id", null: false
+        t.string "cognito_id", null: false
         t.timestamps null: false
       end
     end

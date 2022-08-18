@@ -65,8 +65,6 @@ RSpec.describe CognitoRails::User, type: :model do
   end
 
   context 'user' do
-    include CognitoRails::Helpers
-
     it 'creates a cognito user once created a new user' do
       expect_any_instance_of(CognitoRails::User).to receive(:cognito_client).and_return(fake_cognito_client)
 
@@ -98,35 +96,37 @@ RSpec.describe CognitoRails::User, type: :model do
   end
 
   context 'admin' do
-  include CognitoRails::Helpers
+    before do
+      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+    end
 
-  it 'creates a cognito user once created a new admin' do
-    expect_any_instance_of(CognitoRails::User).to receive(:cognito_client).and_return(fake_cognito_client)
+    it '#find_by_cognito' do
+      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
 
-    admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+      expect(Admin.find_by_cognito(sample_cognito_id)).to eq(admin)
+    end
 
-    expect(admin.external_id).to eq(sample_cognito_id)
-  end
+    it 'creates a cognito user once created a new admin' do
+      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
 
-  it 'destroys the cognito user once destroyed the admin' do
-    expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+      expect(admin.cognito_external_id).to eq(sample_cognito_id)
+    end
 
-    admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+    it 'destroys the cognito user once destroyed the admin' do
 
-    admin.destroy!
-  end
+      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
 
-  it 'saves custom attributes in cognito' do
-    expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+      admin.destroy!
+    end
 
-    expect(fake_cognito_client).to receive(:admin_create_user).with(hash_including(
-      user_attributes: array_including([
-        { name: "custom:role", value: "admin" }
-      ])
-    ))
+    it 'saves custom attributes in cognito' do
+      expect(fake_cognito_client).to receive(:admin_create_user).with(hash_including(
+        user_attributes: array_including([
+          { name: "custom:role", value: "admin" }
+        ])
+      ))
 
-    admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
-  end
-  
+      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+    end
   end
 end
