@@ -1,15 +1,14 @@
 require 'active_support/concern'
 
-require 'jwt'
-require 'open-uri'
-require 'cognito_rails/config'
-require 'cognito_rails/controller'
-require 'cognito_rails/model'
-require 'cognito_rails/user'
-require 'cognito_rails/jwt'
-
 module CognitoRails
   extend ActiveSupport::Concern
+  extend ActiveSupport::Autoload
+
+  autoload :Config
+  autoload :Controller
+  autoload :Model
+  autoload :User
+  autoload :JWT
 
   module ModelInitializer
     def as_cognito_user(attribute_name: 'external_id')

@@ -1,3 +1,6 @@
+require 'jwt'
+require 'open-uri'
+
 module CognitoRails
   class JWT
     class <<self
