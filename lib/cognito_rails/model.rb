@@ -1,4 +1,9 @@
+# frozen_string_literal: true
+
+require 'active_record'
+
 module CognitoRails
+  # ActiveRecord model extension
   module Model
     extend ActiveSupport::Concern
 
@@ -10,18 +15,21 @@ module CognitoRails
       self._cognito_custom_attributes = []
 
       before_create do
-        self.init_cognito_user unless CognitoRails::Config.skip_model_hooks
+        init_cognito_user unless CognitoRails::Config.skip_model_hooks
       end
 
       after_destroy do
-        self.destroy_cognito_user unless CognitoRails::Config.skip_model_hooks
+        destroy_cognito_user unless CognitoRails::Config.skip_model_hooks
       end
     end
 
+    # @return [String]
     def cognito_external_id
       self[self.class._cognito_attribute_name]
     end
 
+    # @param value [String]
+    # @return [String]
     def cognito_external_id=(value)
       self[self.class._cognito_attribute_name] = value
     end
@@ -43,11 +51,12 @@ module CognitoRails
       self.cognito_external_id = cognito_user.id
     end
 
+    # @return [Array<Hash>]
     def instance_custom_attributes
-      self._cognito_custom_attributes.map { |e| { name: e[:name], value: parse_custom_attribute_value(e[:value]) } }
+      _cognito_custom_attributes.map { |e| { name: e[:name], value: parse_custom_attribute_value(e[:value]) } }
     end
 
-    def parse_custom_attribute_value value
+    def parse_custom_attribute_value(value)
       if value.is_a? Symbol
         self[value]
       else
@@ -60,8 +69,10 @@ module CognitoRails
     end
 
     class_methods do
+      # @param name [String] attribute name
+      # @return [ActiveRecord::Base] model class
       def find_by_cognito(external_id)
-        find_by({  self._cognito_attribute_name => external_id })
+        find_by({ _cognito_attribute_name => external_id })
       end
 
       def cognito_verify_email
@@ -72,8 +83,10 @@ module CognitoRails
         self._cognito_verify_phone = true
       end
 
+      # @param name [String] attribute name
+      # @param value [String] attribute name
       def define_cognito_attribute(name, value)
-        self._cognito_custom_attributes << { name: "custom:#{name}", value: value }
+        _cognito_custom_attributes << { name: "custom:#{name}", value: value }
       end
     end
   end

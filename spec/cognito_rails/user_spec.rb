@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 RSpec.describe CognitoRails::User, type: :model do
   include CognitoRails::Helpers
 
@@ -34,7 +37,6 @@ RSpec.describe CognitoRails::User, type: :model do
 
     record = described_class.find(sample_cognito_id)
     expect(record.user_class).to eq(CognitoRails::Config.default_user_class.constantize)
-
   end
 
   context 'persistence' do
@@ -84,14 +86,28 @@ RSpec.describe CognitoRails::User, type: :model do
     it 'saves custom attributes in cognito' do
       expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
 
-      expect(fake_cognito_client).to receive(:admin_create_user).with(hash_including(
-        user_attributes: array_including([
-          { name: "custom:role", value: "user" },
-          { name: "custom:name", value: "TestName" }
-        ])
-      ))
+      expect(fake_cognito_client).to receive(:admin_create_user).with(
+        hash_including(
+          user_attributes: array_including(
+            [
+              {
+                name: 'email_verified', value: 'True'
+              },
+              {
+                name: 'email', value: sample_cognito_email
+              },
+              {
+                name: 'custom:role', value: 'user'
+              },
+              {
+                name: 'custom:name', value: 'TestName'
+              }
+            ]
+          )
+        )
+      )
 
-      user = User.create!(email: sample_cognito_email, name: 'TestName')
+      User.create!(email: sample_cognito_email, name: 'TestName')
     end
   end
 
@@ -101,32 +117,49 @@ RSpec.describe CognitoRails::User, type: :model do
     end
 
     it '#find_by_cognito' do
-      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+      admin = Admin.create!(email: sample_cognito_email, phone: '12345678')
 
       expect(Admin.find_by_cognito(sample_cognito_id)).to eq(admin)
     end
 
     it 'creates a cognito user once created a new admin' do
-      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+      admin = Admin.create!(email: sample_cognito_email, phone: '12345678')
 
       expect(admin.cognito_external_id).to eq(sample_cognito_id)
     end
 
     it 'destroys the cognito user once destroyed the admin' do
-
-      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+      admin = Admin.create!(email: sample_cognito_email, phone: '12345678')
 
       admin.destroy!
     end
 
     it 'saves custom attributes in cognito' do
-      expect(fake_cognito_client).to receive(:admin_create_user).with(hash_including(
-        user_attributes: array_including([
-          { name: "custom:role", value: "admin" }
-        ])
-      ))
+      expect(fake_cognito_client).to receive(:admin_create_user).with(
+        hash_including(
+          user_attributes: array_including(
+            [
+              {
+                name: 'phone_number_verified', value: 'True'
+              },
+              {
+                name: 'email_verified', value: 'True'
+              },
+              {
+                name: 'phone_number', value: '12345678'
+              },
+              {
+                name: 'email', value: sample_cognito_email
+              },
+              {
+                name: 'custom:role', value: 'admin'
+              }
+            ]
+          )
+        )
+      )
 
-      admin = Admin.create!(email: sample_cognito_email, phone: "12345678")
+      Admin.create!(email: sample_cognito_email, phone: '12345678')
     end
   end
 end

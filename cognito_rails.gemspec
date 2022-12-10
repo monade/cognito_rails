@@ -11,11 +11,11 @@ Gem::Specification.new do |s|
   s.files = Dir['lib/**/*']
   s.test_files = Dir['spec/**/*']
   s.required_ruby_version = '>= 2.7.0'
-  s.homepage    = 'https://rubygems.org/gems/monade-cognito'
+  s.homepage    = 'https://rubygems.org/gems/cognito_rails'
   s.license     = 'MIT'
   s.add_dependency 'activesupport', ['>= 5', '< 8']
-  s.add_dependency 'jwt'
   s.add_dependency 'aws-sdk-cognitoidentityprovider'
+  s.add_dependency 'jwt'
   s.add_development_dependency 'rspec', '~> 3'
   s.add_development_dependency 'rubocop'
 end

@@ -1,6 +1,8 @@
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 RSpec.describe CognitoRails::Controller, type: :model do
+  # rubocop:enable Metrics/BlockLength
   include CognitoRails::Helpers
 
   context 'with an API controller' do

@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 RSpec.describe CognitoRails::JWT, type: :model do
+  # rubocop:enable Metrics/BlockLength
   before do
     allow(URI).to receive(:open).and_return(double(read: jwks))
   end
@@ -25,8 +29,8 @@ RSpec.describe CognitoRails::JWT, type: :model do
 
     it 'decodes a token correctly' do
       expect(described_class.decode(token)[0]).to eq({
-        'data' => 'data',
-      })
+                                                       'data' => 'data'
+                                                     })
     end
 
     it 'fails to decode if the token is invalid' do

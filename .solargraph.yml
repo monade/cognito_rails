@@ -1,0 +1,29 @@
+---
+include:
+- "**/*.rb"
+exclude:
+- spec/**/*
+- test/**/*
+- vendor/**/*
+- ".bundle/**/*"
+require:
+- actionpack
+- activejob
+- activemodel
+- activerecord
+- activesupport
+- aws-sdk-cognitoidentityprovider
+domains: []
+reporters:
+- rubocop
+- require_not_found
+- typecheck:strict
+formatter:
+  rubocop:
+    cops: safe
+    except: []
+    only: []
+    extra_args: []
+require_paths: []
+plugins: []
+max_files: 5000

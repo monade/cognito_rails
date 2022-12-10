@@ -1,9 +1,14 @@
+# frozen_string_literal: true
+
 require 'jwt'
 require 'open-uri'
+require 'json'
 
 module CognitoRails
   class JWT
-    class <<self
+    class << self
+      # @param token [String] JWT token
+      # @return [Array<Hash>,nil]
       def decode(token)
         aws_idp = with_cache { URI.open(jwks_url).read }
         jwt_config = JSON.parse(aws_idp, symbolize_names: true)
@@ -20,12 +25,13 @@ module CognitoRails
         "https://cognito-idp.#{Config.aws_region}.amazonaws.com/#{Config.aws_user_pool_id}/.well-known/jwks.json"
       end
 
-      def with_cache
+      # @param block [Proc]
+      # @yield [String] to be cached
+      # @return [String] cached block
+      def with_cache(&block)
         return yield unless Config.cache_adapter.respond_to?(:fetch)
 
-        Config.cache_adapter.fetch('aws_idp', expires_in: 4.hours) do
-          yield
-        end
+        Config.cache_adapter.fetch('aws_idp', expires_in: 4.hours, &block)
       end
     end
   end

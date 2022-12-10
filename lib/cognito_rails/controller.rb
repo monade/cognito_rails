@@ -1,25 +1,37 @@
-module CognitoRails::Controller
-  extend ActiveSupport::Concern
+# frozen_string_literal: true
 
-  included do
-    class_attribute :_cognito_user_class
-  end
+module CognitoRails
+  module Controller
+    extend ActiveSupport::Concern
 
-  def current_user
-    @current_user ||= cognito_user_klass.find_by_cognito(external_cognito_id) if external_cognito_id
-  end
+    # @scope class
+    # @!attribute _cognito_user_class [rw]
+    #   @return [String,nil] class name of user model
 
-  private
+    included do
+      class_attribute :_cognito_user_class
+    end
 
-  def cognito_user_klass
-    @cognito_user_klass ||= (self.class._cognito_user_class || CognitoRails::Config.default_user_class)&.constantize
-  end
+    # @return [ActiveRecord::Base,nil]
+    def current_user
+      @current_user ||= cognito_user_klass.find_by_cognito(external_cognito_id) if external_cognito_id
+    end
 
-  def external_cognito_id
-    token = request.headers['Authorization']&.split(' ')&.last
+    private
 
-    return unless token
+    # @return [#find_by_cognito]
+    def cognito_user_klass
+      @cognito_user_klass ||= (self.class._cognito_user_class || CognitoRails::Config.default_user_class)&.constantize
+    end
 
-    CognitoRails::JWT.decode(token)&.dig(0, 'sub')
+    # @return [String,nil] cognito user id
+    def external_cognito_id
+      # @type [String,nil]
+      token = request.headers['Authorization']&.split(' ')&.last
+
+      return unless token
+
+      CognitoRails::JWT.decode(token)&.dig(0, 'sub')
+    end
   end
 end
