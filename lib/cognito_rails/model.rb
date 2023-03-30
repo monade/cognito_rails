@@ -23,6 +23,55 @@ module CognitoRails
       end
     end
 
+    # rubocop:disable Metrics/BlockLength
+    class_methods do
+      # @return [Array<ActiveRecord::Base>] all users
+      # @raise [CognitoRails::Error] if failed to fetch users
+      # @raise [ActiveRecord::RecordInvalid] if failed to save user
+      def sync_from_cognito!
+        response = User.all
+        response.users.map do |user_data|
+          sync_user!(user_data)
+        end
+      end
+
+      # @return [Array<ActiveRecord::Base>] all users
+      # @raise [CognitoRails::Error] if failed to fetch users
+      # @raise [ActiveRecord::RecordInvalid] if failed to save user
+      def sync_to_cognito!
+        find_each.map do |user|
+          user.init_cognito_user
+          user.save!
+        end
+      end
+
+      private
+
+      def sync_user!(user_data)
+        external_id = user_data.username
+        return if external_id.blank?
+
+        user = find_or_initialize_by(_cognito_attribute_name => external_id)
+        user.email = User.extract_cognito_attribute(user_data.attributes, :email)
+        user.phone = User.extract_cognito_attribute(user_data.attributes, :phone_number) if user.respond_to?(:phone)
+        _cognito_resolve_custom_attribute(user, user_data)
+
+        user.save!
+        user
+      end
+
+      def _cognito_resolve_custom_attribute(user, user_data)
+        _cognito_custom_attributes.each do |attribute|
+          next if attribute[:value].is_a?(String)
+
+          value = User.extract_cognito_attribute(user_data.attributes, attribute[:name])
+          next unless value
+
+          user[attribute[:name].gsub('custom:', '')] = value
+        end
+      end
+    end
+
     # @return [String]
     def cognito_external_id
       self[self.class._cognito_attribute_name]

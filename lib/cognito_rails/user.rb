@@ -57,9 +57,13 @@ module CognitoRails
       )
       user = new(user_class: user_class)
       user.id = result.username
-      user.email = result.user_attributes.find { |attribute| attribute[:name] == 'email' }[:value]
-      user.phone = result.user_attributes.find { |attribute| attribute[:name] == 'phone_number' }&.dig(:value)
+      user.email = extract_cognito_attribute(result.user_attributes, :email)
+      user.phone = extract_cognito_attribute(result.user_attributes, :phone_number)
       user
+    end
+
+    def self.all
+      cognito_client.list_users(user_pool_id: CognitoRails::Config.aws_user_pool_id)
     end
 
     # @param attributes [Hash]
@@ -138,6 +142,18 @@ module CognitoRails
       destroy || (raise ActiveRecord::RecordInvalid, self)
     end
 
+    # @return [Aws::CognitoIdentityProvider::Client]
+    # @raise [RuntimeError]
+    def self.cognito_client
+      @cognito_client ||= Aws::CognitoIdentityProvider::Client.new(
+        { region: CognitoRails::Config.aws_region }.merge(CognitoRails::Config.aws_client_credentials)
+      )
+    end
+
+    def self.extract_cognito_attribute(attributes, column)
+      attributes.find { |attribute| attribute[:name] == column.to_s }&.dig(:value)
+    end
+
     private
 
     # @return [Aws::CognitoIdentityProvider::Client]
@@ -153,14 +169,6 @@ module CognitoRails
     # @return [Boolean]
     def verify_phone?
       user_class._cognito_verify_phone
-    end
-
-    # @return [Aws::CognitoIdentityProvider::Client]
-    # @raise [RuntimeError]
-    def self.cognito_client
-      @cognito_client ||= Aws::CognitoIdentityProvider::Client.new(
-        { region: CognitoRails::Config.aws_region }.merge(CognitoRails::Config.aws_client_credentials)
-      )
     end
 
     # @return [Array<Hash>]

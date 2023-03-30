@@ -40,4 +40,24 @@ module CognitoRails::Helpers
       client
     end
   end
+
+  def build_cognito_user_data(email)
+    OpenStruct.new(
+      username: SecureRandom.uuid,
+      user_status: 'CONFIRMED',
+      enabled: true,
+      user_last_modified_date: Time.now,
+      attributes: [
+        OpenStruct.new(
+          name: 'email',
+          value: email
+        ),
+        OpenStruct.new(
+          name: 'custom:name',
+          value: 'Giovanni'
+        )
+      ],
+      mfa_options: []
+    )
+  end
 end

@@ -111,6 +111,42 @@ RSpec.describe CognitoRails::User, type: :model do
     end
   end
 
+  context 'class methods' do
+    before do
+      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+    end
+
+    it '#sync_from_cognito!' do
+      expect(fake_cognito_client).to receive(:list_users).and_return(
+        OpenStruct.new(
+          users: [
+            build_cognito_user_data('some@example.com'),
+            build_cognito_user_data('some2@example.com')
+          ],
+          pagination_token: nil
+        )
+      )
+
+      expect do
+        users = User.sync_from_cognito!
+
+        expect(users).to be_a(Array)
+        expect(users.size).to eq(2)
+        expect(users.first).to be_a(User)
+      end.to change { User.count }.by(2)
+
+      expect(User.pluck(:email)).to match_array(['some@example.com', 'some2@example.com'])
+      expect(User.pluck(:name)).to match_array(['Giovanni', 'Giovanni'])
+    end
+
+    it '#sync_to_cognito!' do
+      User.create!(email: sample_cognito_email)
+
+      expect_any_instance_of(User).to receive(:init_cognito_user).exactly(1).times
+      User.sync_to_cognito!
+    end
+  end
+
   context 'admin' do
     before do
       expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
