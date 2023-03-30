@@ -158,12 +158,8 @@ module CognitoRails
     # @return [Aws::CognitoIdentityProvider::Client]
     # @raise [RuntimeError]
     def self.cognito_client
-      raise 'Can\'t create user in test mode' if Rails.env.test?
-
       @cognito_client ||= Aws::CognitoIdentityProvider::Client.new(
-        access_key_id: CognitoRails::Config.aws_access_key_id,
-        secret_access_key: CognitoRails::Config.aws_secret_access_key,
-        region: CognitoRails::Config.aws_region
+        { region: CognitoRails::Config.aws_region }.merge(CognitoRails::Config.aws_client_credentials)
       )
     end
 

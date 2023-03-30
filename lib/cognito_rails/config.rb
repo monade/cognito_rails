@@ -5,26 +5,21 @@ require 'logger'
 module CognitoRails
   class Config
     class << self
-      # @raise [RuntimeError] if not set
       # @return [String] AWS access key id
-      def aws_access_key_id
-        # @type [String,nil]
-        @aws_access_key_id || (raise 'Missing config aws_access_key_id')
+      def aws_client_credentials
+        @aws_client_credentials || {}
       end
 
-      # @!attribute aws_access_key_id [w]
-      #   @return [String]
+      # @!attribute aws_client_credentials [w]
+      #   @return [Hash]
       # @!attribute aws_region [w]
-      #   @return [String]
-      # @!attribute aws_secret_access_key [w]
       #   @return [String]
       # @!attribute aws_user_pool_id [w]
       #   @return [String]
       # @!attribute default_user_class [w]
       #   @return [String,nil]
-      attr_writer :aws_access_key_id, :skip_model_hooks, :aws_region,
-                  :aws_secret_access_key, :aws_user_pool_id,
-                  :default_user_class
+      attr_writer :aws_client_credentials, :skip_model_hooks, :aws_region,
+                  :aws_user_pool_id, :default_user_class
 
       # @return [Boolean] skip model hooks
       def skip_model_hooks
@@ -41,12 +36,6 @@ module CognitoRails
       # @raise [RuntimeError] if not set
       def aws_region
         @aws_region || (raise 'Missing config aws_region')
-      end
-
-      # @return [String] AWS secret access key
-      # @raise [RuntimeError] if not set
-      def aws_secret_access_key
-        @aws_secret_access_key || (raise 'Missing config aws_secret_access_key')
       end
 
       # @return [String] AWS user pool id

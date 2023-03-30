@@ -22,10 +22,13 @@ cognito_credentials = if Rails.env.production?
                         Rails.application.credentials&.dig(:cognito, :staging)
                       end
 
-CognitoRails::Config.aws_access_key_id = cognito_credentials&.dig(:access_key_id) || 'test'
-CognitoRails::Config.aws_region = cognito_credentials&.dig(:region) || 'test'
-CognitoRails::Config.aws_secret_access_key = cognito_credentials&.dig(:secret_access_key) || 'test'
-CognitoRails::Config.aws_user_pool_id = cognito_credentials&.dig(:user_pool_id) || 'test'
+CognitoRails::Config.aws_client_credentials = {
+  access_key_id: cognito_credentials&.dig(:access_key_id),
+  secret_access_key: cognito_credentials&.dig(:secret_access_key),
+}
+
+CognitoRails::Config.aws_region = cognito_credentials&.dig(:region)
+CognitoRails::Config.aws_user_pool_id = cognito_credentials&.dig(:user_pool_id)
 CognitoRails::Config.default_user_class = 'User'
 # Optional
 CognitoRails::Config.logger = Rails.logger # To receive logs
