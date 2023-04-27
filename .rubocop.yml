@@ -1,0 +1,14 @@
+AllCops:
+  Exclude:
+    - "db/schema.rb"
+    - "bin/**/*"
+    - "Guardfile"
+    - "vendor/**/*"
+
+require:
+  - rubocop-performance
+
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"

@@ -2,9 +2,7 @@
 
 require 'spec_helper'
 
-# rubocop:disable Metrics/BlockLength
 RSpec.describe CognitoRails::JWT, type: :model do
-  # rubocop:enable Metrics/BlockLength
   before do
     allow(URI).to receive(:open).and_return(double(read: jwks))
   end

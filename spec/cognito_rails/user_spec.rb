@@ -2,7 +2,6 @@
 
 require 'spec_helper'
 
-# rubocop:disable Metrics/BlockLength
 RSpec.describe CognitoRails::User, type: :model do
   include CognitoRails::Helpers
 
