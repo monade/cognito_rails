@@ -39,7 +39,7 @@ module CognitoRails
     def initialize(attributes = {})
       attributes = attributes.with_indifferent_access
       self.email = attributes[:email]
-      self.password = attributes[:password] || SecureRandom.urlsafe_base64
+      self.password = attributes[:password] || Config.password_generator.call
       self.phone = attributes[:phone]
       self.user_class = attributes[:user_class] || Config.default_user_class.constantize
       self.custom_attributes = attributes[:custom_attributes]

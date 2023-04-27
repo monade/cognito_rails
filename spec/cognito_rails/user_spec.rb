@@ -82,6 +82,21 @@ RSpec.describe CognitoRails::User, type: :model do
       user.destroy!
     end
 
+    it 'uses the password generator defined in config' do
+      CognitoRails::Config.password_generator = -> { 'ciao' }
+      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+
+      expect(fake_cognito_client).to receive(:admin_create_user).with(
+        hash_including(
+          temporary_password: 'ciao'
+        )
+      )
+      user = User.new(email: sample_cognito_email)
+      user.save!
+    ensure
+      CognitoRails::Config.password_generator = nil
+    end
+
     it 'uses the custom password passed as parameter' do
       expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
 

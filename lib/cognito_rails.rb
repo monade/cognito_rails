@@ -15,6 +15,7 @@ module CognitoRails
   autoload :Model
   autoload :User
   autoload :JWT
+  autoload :PasswordGenerator
 
   # @private
   module ModelInitializer

@@ -19,7 +19,7 @@ module CognitoRails
       # @!attribute default_user_class [w]
       #   @return [String,nil]
       attr_writer :aws_client_credentials, :skip_model_hooks, :aws_region,
-                  :aws_user_pool_id, :default_user_class
+                  :aws_user_pool_id, :default_user_class, :password_generator
 
       # @return [Boolean] skip model hooks
       def skip_model_hooks
@@ -48,6 +48,10 @@ module CognitoRails
       # @raise [RuntimeError] if not set
       def default_user_class
         @default_user_class || (raise 'Missing config default_user_class')
+      end
+
+      def password_generator
+        @password_generator || CognitoRails::PasswordGenerator.method(:generate)
       end
     end
   end
