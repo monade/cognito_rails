@@ -92,12 +92,17 @@ module CognitoRails
     def init_cognito_user
       return if cognito_external_id.present?
 
-      attrs = { email: email, user_class: self.class }
-      attrs[:phone] = phone if respond_to?(:phone)
-      attrs[:custom_attributes] = instance_custom_attributes
-      cognito_user = User.new(attrs)
+      cognito_user = User.new(init_attributes)
       cognito_user.save!
       self.cognito_external_id = cognito_user.id
+    end
+
+    def init_attributes
+      attrs = { email: email, user_class: self.class }
+      attrs[:phone] = phone if respond_to?(:phone)
+      attrs[:password] = password if respond_to?(:password)
+      attrs[:custom_attributes] = instance_custom_attributes
+      attrs
     end
 
     # @return [Array<Hash>]

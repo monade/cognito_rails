@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   cognito_verify_email
   define_cognito_attribute 'role', 'user'
   define_cognito_attribute 'name', :name
+
+  attr_accessor :password
 end
 
 class Admin < ActiveRecord::Base

@@ -83,6 +83,19 @@ RSpec.describe CognitoRails::User, type: :model do
       user.destroy!
     end
 
+    it 'uses the custom password passed as parameter' do
+      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+
+      expect(fake_cognito_client).to receive(:admin_create_user).with(
+        hash_including(
+          temporary_password: '12345678'
+        )
+      )
+      user = User.new(email: sample_cognito_email)
+      user.password = '12345678'
+      user.save!
+    end
+
     it 'saves custom attributes in cognito' do
       expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
 
