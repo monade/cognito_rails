@@ -28,10 +28,13 @@ module CognitoRails
       # @return [Array<ActiveRecord::Base>] all users
       # @raise [CognitoRails::Error] if failed to fetch users
       # @raise [ActiveRecord::RecordInvalid] if failed to save user
+      # @yield [user, user_data] yields user and user_data just before saving
       def sync_from_cognito!
         response = User.all
         response.users.map do |user_data|
-          sync_user!(user_data)
+          sync_user!(user_data) do |user|
+            yield user, user_data if block_given?
+          end
         end
       end
 
@@ -55,6 +58,8 @@ module CognitoRails
         user.email = User.extract_cognito_attribute(user_data.attributes, :email)
         user.phone = User.extract_cognito_attribute(user_data.attributes, :phone_number) if user.respond_to?(:phone)
         _cognito_resolve_custom_attribute(user, user_data)
+
+        yield user if block_given?
 
         user.save!
         user

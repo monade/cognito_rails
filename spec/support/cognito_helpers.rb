@@ -54,7 +54,7 @@ module CognitoRails::Helpers
         ),
         OpenStruct.new(
           name: 'custom:name',
-          value: 'Giovanni'
+          value: 'John Doe'
         )
       ],
       mfa_options: []

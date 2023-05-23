@@ -17,6 +17,19 @@ class User < ActiveRecord::Base
   attr_accessor :password
 end
 
+class EnrichedUser < ActiveRecord::Base
+  validates :email, presence: true
+  validates :email, uniqueness: true
+  validates :first_name, :last_name, presence: true
+
+  as_cognito_user
+  cognito_verify_email
+  define_cognito_attribute 'role', 'user'
+
+  attr_accessor :password
+end
+
+
 class Admin < ActiveRecord::Base
   validates :email, presence: true
   validates :email, uniqueness: true
@@ -37,6 +50,14 @@ module Schema
       create_table :users, force: true do |t|
         t.string "email", null: false
         t.string "name"
+        t.string "external_id", null: false
+        t.timestamps null: false
+      end
+
+      create_table :enriched_users, force: true do |t|
+        t.string "email", null: false
+        t.string "first_name", null: false
+        t.string "last_name", null: false
         t.string "external_id", null: false
         t.timestamps null: false
       end

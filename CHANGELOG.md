@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project made by Monade Team are documented in this file. For info refer to team@monade.io
 
+## [1.2.0] - 2023-05-23
+### Added
+- `sync_from_cognito!` now accepts a block to configure extra fields before save
+
 ## [1.1.0] - 2023-04-27
 ### Added
 - A password generator that follows [Cognito policies](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-policies.html)
