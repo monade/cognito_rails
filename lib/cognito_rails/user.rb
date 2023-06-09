@@ -55,7 +55,7 @@ module CognitoRails
           username: id # required
         }
       )
-      user = new(user_class:)
+      user = new(user_class: user_class)
       user.id = result.username
       user.email = extract_cognito_attribute(result.user_attributes, :email)
       user.phone = extract_cognito_attribute(result.user_attributes, :phone_number)
@@ -207,7 +207,7 @@ module CognitoRails
         {
           user_pool_id: CognitoRails::Config.aws_user_pool_id,
           username: email,
-          password:,
+          password: password,
           permanent: true
         }
       )

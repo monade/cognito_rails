@@ -104,7 +104,7 @@ module CognitoRails
     end
 
     def init_attributes
-      attrs = { email:, user_class: self.class }
+      attrs = { email: email, user_class: self.class }
       attrs[:phone] = phone if respond_to?(:phone)
       attrs[:password] = password if respond_to?(:password)
       attrs[:custom_attributes] = instance_custom_attributes
