@@ -60,6 +60,7 @@ class User < ApplicationRecord
   as_cognito_user
   cognito_verify_email
   cognito_verify_phone
+  cognito_password_policy :temporary
   define_cognito_attribute 'role', :role
   define_cognito_attribute 'test', 'some fixed value'
 
@@ -73,14 +74,14 @@ end
 
 `:email` and `:phone` are automatically saved as Cognito attributes from the model.
 `cognito_verify_email` and `cognito_verify_phone` add email and phone verification on user creation.
+`cognito_password_policy` chose the password policy on user creation (:temporary, :user_provided), the default is :temporary
 `define_cognito_attribute` assign a custom Cognito attribute to the user. **This won't work if you don't add the custom attribute through the Cognito console in advance**
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
-About Monade
-----------------
+## About Monade
 
 ![monade](https://monade.io/wp-content/uploads/2021/06/monadelogo.png)
 
