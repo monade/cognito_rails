@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project made by Monade Team are documented in this file. For info refer to team@monade.io
 
+## [1.3.0] - 2023-06-09
+### Added
+- `cognito_password_policy` model attribute to specify cognito password policy on user creation
+
 ## [1.2.0] - 2023-05-23
 ### Added
 - `sync_from_cognito!` now accepts a block to configure extra fields before save
