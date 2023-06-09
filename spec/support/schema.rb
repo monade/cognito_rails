@@ -42,6 +42,20 @@ class Admin < ActiveRecord::Base
   define_cognito_attribute 'role', 'admin'
 end
 
+
+class PasswordProvidedUser < ActiveRecord::Base
+  validates :email, presence: true
+  validates :email, uniqueness: true
+
+  as_cognito_user
+  cognito_verify_email
+  cognito_password_policy :user_provided
+  define_cognito_attribute 'role', 'user'
+  define_cognito_attribute 'name', :name
+
+  attr_accessor :password
+end
+
 module Schema
   def self.create
     ActiveRecord::Migration.verbose = false
@@ -66,6 +80,13 @@ module Schema
         t.string "email", null: false
         t.string "phone", null: false
         t.string "cognito_id", null: false
+        t.timestamps null: false
+      end
+
+      create_table :password_provided_users, force: true do |t|
+        t.string "email", null: false
+        t.string "name"
+        t.string "external_id", null: false
         t.timestamps null: false
       end
     end

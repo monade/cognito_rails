@@ -12,6 +12,7 @@ module CognitoRails
       class_attribute :_cognito_verify_phone
       class_attribute :_cognito_custom_attributes
       class_attribute :_cognito_attribute_name
+      class_attribute :_cognito_password_policy
       self._cognito_custom_attributes = []
 
       before_create do
@@ -103,7 +104,7 @@ module CognitoRails
     end
 
     def init_attributes
-      attrs = { email: email, user_class: self.class }
+      attrs = { email:, user_class: self.class }
       attrs[:phone] = phone if respond_to?(:phone)
       attrs[:password] = password if respond_to?(:password)
       attrs[:custom_attributes] = instance_custom_attributes
@@ -142,10 +143,14 @@ module CognitoRails
         self._cognito_verify_phone = true
       end
 
+      def cognito_password_policy(type)
+        self._cognito_password_policy = type
+      end
+
       # @param name [String] attribute name
       # @param value [String] attribute name
       def define_cognito_attribute(name, value)
-        _cognito_custom_attributes << { name: "custom:#{name}", value: value }
+        _cognito_custom_attributes << { name: "custom:#{name}", value: }
       end
     end
   end

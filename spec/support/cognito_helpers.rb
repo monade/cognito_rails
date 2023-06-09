@@ -11,8 +11,7 @@ module CognitoRails::Helpers
         expect(params).to match_structure(
           user_pool_id: one_of(String, nil),
           username: String,
-          temporary_password: String,
-          user_attributes: a_list_of(name: String, value: one_of(String, nil))
+          user_attributes: a_list_of(name: String, value: one_of(String, nil)),
         )
         OpenStruct.new(user: OpenStruct.new(attributes: [{ name: 'sub', value: sample_cognito_id }]))
       end
@@ -32,7 +31,7 @@ module CognitoRails::Helpers
               { name: 'sub', value: sample_cognito_id },
               { name: 'email', value: sample_cognito_email },
               { name: 'phone', value: sample_cognito_phone },
-              { name: 'custom:name', value: "TestName" }
+              { name: 'custom:name', value: 'TestName' }
             ]
           }
         )

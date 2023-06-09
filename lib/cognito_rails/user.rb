@@ -55,7 +55,7 @@ module CognitoRails
           username: id # required
         }
       )
-      user = new(user_class: user_class)
+      user = new(user_class:)
       user.id = result.username
       user.email = extract_cognito_attribute(result.user_attributes, :email)
       user.phone = extract_cognito_attribute(result.user_attributes, :phone_number)
@@ -171,6 +171,11 @@ module CognitoRails
       user_class._cognito_verify_phone
     end
 
+    # @return [Symbol] :temporary | :user_provided
+    def cognito_password_policy
+      user_class._cognito_password_policy || :temporary
+    end
+
     # @return [Array<Hash>]
     def general_user_attributes
       [
@@ -188,18 +193,41 @@ module CognitoRails
       ]
     end
 
+    # @return [Array<Hash>]
+    def password_attributes
+      if cognito_password_policy == :user_provided
+        { message_action: 'SUPPRESS' }
+      else
+        { temporary_password: password }
+      end
+    end
+
+    def set_user_provided_password
+      cognito_client.admin_set_user_password(
+        {
+          user_pool_id: CognitoRails::Config.aws_user_pool_id,
+          username: email,
+          password:,
+          permanent: true
+        }
+      )
+    end
+
     def save_for_create
       resp = cognito_client.admin_create_user(
         {
           user_pool_id: CognitoRails::Config.aws_user_pool_id,
           username: email,
-          temporary_password: password,
           user_attributes: [
             *general_user_attributes,
             *verify_user_attributes
-          ]
+          ],
+          **password_attributes
         }
       )
+
+      set_user_provided_password if cognito_password_policy == :user_provided
+
       self.id = resp.user.attributes.find { |a| a[:name] == 'sub' }[:value]
     end
 

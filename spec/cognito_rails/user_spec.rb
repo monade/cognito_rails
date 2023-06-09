@@ -7,6 +7,7 @@ RSpec.describe CognitoRails::User, type: :model do
 
   let(:sample_cognito_email) { 'some@mail.com' }
   let(:sample_cognito_phone) { '123456789' }
+  let(:sample_cognito_password) { '123qweASD!@#' }
 
   it 'validates email presence' do
     expect(subject).to have(1).error_on(:email)
@@ -136,6 +137,14 @@ RSpec.describe CognitoRails::User, type: :model do
 
       User.create!(email: sample_cognito_email, name: 'TestName')
     end
+
+    it 'creates a cognito user with user_provided' do
+      expect(fake_cognito_client).to receive(:admin_set_user_password).exactly(1).time.and_return(OpenStruct.new)
+
+      allow_any_instance_of(CognitoRails::User).to receive(:cognito_client).and_return(fake_cognito_client)
+      PasswordProvidedUser.create!(email: sample_cognito_email, password: sample_cognito_password)
+      User.create!(email: sample_cognito_email)
+    end
   end
 
   context 'class methods' do
@@ -184,8 +193,8 @@ RSpec.describe CognitoRails::User, type: :model do
         end.to change { EnrichedUser.count }.by(2)
 
         expect(EnrichedUser.pluck(:email)).to match_array(['some@example.com', 'some2@example.com'])
-        expect(EnrichedUser.order(:id).pluck(:first_name)).to match_array(['John1', 'John2'])
-        expect(EnrichedUser.order(:id).pluck(:last_name)).to match_array(['Doe', 'Doe'])
+        expect(EnrichedUser.order(:id).pluck(:first_name)).to match_array(%w[John1 John2])
+        expect(EnrichedUser.order(:id).pluck(:last_name)).to match_array(%w[Doe Doe])
       end
     end
 
