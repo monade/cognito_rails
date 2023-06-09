@@ -150,7 +150,7 @@ module CognitoRails
       # @param name [String] attribute name
       # @param value [String] attribute name
       def define_cognito_attribute(name, value)
-        _cognito_custom_attributes << { name: "custom:#{name}", value: }
+        _cognito_custom_attributes << { name: "custom:#{name}", value: value }
       end
     end
   end
