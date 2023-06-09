@@ -12,6 +12,7 @@ module CognitoRails
       class_attribute :_cognito_verify_phone
       class_attribute :_cognito_custom_attributes
       class_attribute :_cognito_attribute_name
+      class_attribute :_cognito_password_policy
       self._cognito_custom_attributes = []
 
       before_create do
@@ -140,6 +141,10 @@ module CognitoRails
 
       def cognito_verify_phone
         self._cognito_verify_phone = true
+      end
+
+      def cognito_password_policy(type)
+        self._cognito_password_policy = type
       end
 
       # @param name [String] attribute name
