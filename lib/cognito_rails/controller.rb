@@ -27,12 +27,12 @@ module CognitoRails
 
     # @return [String,nil] cognito user id
     def external_cognito_id
-      reads_param = self.class._cognito_read_token_from_param
+      reads_from_param = self.class._cognito_read_token_from_param
 
-      token = request.query_parameters[reads_param] if reads_param
+      token = request.query_parameters[reads_from_param] if reads_from_param
 
       # @type [String,nil]
-      token ||= request.headers['Authorization']&.split(' ')&.last unless token.present?
+      token ||= request.headers['Authorization']&.split(' ')&.last unless reads_from_param
 
       return unless token
 
