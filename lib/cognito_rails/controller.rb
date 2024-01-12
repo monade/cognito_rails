@@ -10,6 +10,7 @@ module CognitoRails
 
     included do
       class_attribute :_cognito_user_class
+      class_attribute :_cognito_read_token_from_param
     end
 
     # @return [ActiveRecord::Base,nil]
@@ -26,8 +27,12 @@ module CognitoRails
 
     # @return [String,nil] cognito user id
     def external_cognito_id
+      reads_param = self.class._cognito_read_token_from_param
+
+      token = request.query_parameters[reads_param] if reads_param
+
       # @type [String,nil]
-      token = request.headers['Authorization']&.split(' ')&.last
+      token ||= request.headers['Authorization']&.split(' ')&.last unless token.present?
 
       return unless token
 
