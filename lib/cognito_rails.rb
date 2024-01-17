@@ -35,6 +35,11 @@ module CognitoRails
       send :include, CognitoRails::Controller
       self._cognito_user_class = user_class
     end
+
+    def cognito_token_from(param: nil)
+      send :include, CognitoRails::Controller
+      self._cognito_read_token_from_param = param
+    end
   end
 end
 
