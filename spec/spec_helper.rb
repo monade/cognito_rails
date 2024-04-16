@@ -7,6 +7,7 @@ require 'cognito_rails'
 require 'factory_bot_rails'
 require 'rspec/collection_matchers'
 require 'factories/user'
+require 'ostruct'
 
 I18n.enforce_available_locales = false
 RSpec::Expectations.configuration.warn_about_potential_false_positives = false
