@@ -64,8 +64,6 @@ class User < ApplicationRecord
   define_cognito_attribute 'role', :role
   define_cognito_attribute 'test', 'some fixed value'
 
-  as_queryable
-  queryable filter: [], order: { created_at: :asc }
   has_many :projects, dependent: :restrict_with_error
 
   enum role: { user: 0, agency: 500, admin: 1000, superadmin: 9999 }
