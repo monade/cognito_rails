@@ -4,6 +4,7 @@ All notable changes to this project made by Monade Team are documented in this f
 ## [1.4.0] - 2025-01-20
 ### Added
 - Support for Rails 8
+- Support for ruby 3.4
 
 ### Removed
 - Drop support for Rails 5

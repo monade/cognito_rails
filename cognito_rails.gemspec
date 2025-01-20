@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'activesupport', ['>= 6', '< 9']
   s.add_dependency 'aws-sdk-cognitoidentityprovider'
   s.add_dependency 'jwt'
+  s.add_dependency 'ostruct'
   s.add_development_dependency 'rspec', '~> 3'
   s.add_development_dependency 'rubocop'
 end
