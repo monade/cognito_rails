@@ -4,6 +4,7 @@ require 'active_support/concern'
 require 'active_support/dependencies/autoload'
 require 'active_record'
 require 'action_controller/metal'
+require 'ostruct'
 
 # Provides a set of tools to integrate AWS Cognito in your Rails app
 module CognitoRails

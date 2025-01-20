@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project made by Monade Team are documented in this file. For info refer to team@monade.io
 
+## [1.4.0] - 2025-01-20
+### Added
+- Support for Rails 8
+
+### Removed
+- Drop support for Rails 5
+- Drop support for Ruby 2.7
+
 ## [1.3.0] - 2023-06-09
 ### Added
 - `cognito_password_policy` model attribute to specify cognito password policy on user creation

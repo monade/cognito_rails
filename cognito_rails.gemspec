@@ -10,10 +10,10 @@ Gem::Specification.new do |s|
   s.email = 'team@monade.io'
   s.files = Dir['lib/**/*']
   s.test_files = Dir['spec/**/*']
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 3.0.0'
   s.homepage    = 'https://rubygems.org/gems/cognito_rails'
   s.license     = 'MIT'
-  s.add_dependency 'activesupport', ['>= 5', '< 8']
+  s.add_dependency 'activesupport', ['>= 6', '< 9']
   s.add_dependency 'aws-sdk-cognitoidentityprovider'
   s.add_dependency 'jwt'
   s.add_development_dependency 'rspec', '~> 3'
