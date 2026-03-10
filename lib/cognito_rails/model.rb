@@ -13,6 +13,8 @@ module CognitoRails
       class_attribute :_cognito_custom_attributes
       class_attribute :_cognito_attribute_name
       class_attribute :_cognito_password_policy
+      class_attribute :_cognito_aws_user_pool_id
+      class_attribute :_cognito_aws_client_credentials
       self._cognito_custom_attributes = []
 
       before_create do
@@ -31,7 +33,7 @@ module CognitoRails
       # @raise [ActiveRecord::RecordInvalid] if failed to save user
       # @yield [user, user_data] yields user and user_data just before saving
       def sync_from_cognito!
-        response = User.all
+        response = User.all(self)
         response.users.map do |user_data|
           sync_user!(user_data) do |user|
             yield user, user_data if block_given?
@@ -90,7 +92,7 @@ module CognitoRails
     end
 
     def cognito_user
-      @cognito_user ||= User.find(cognito_external_id, user_class: self.class)
+      @cognito_user ||= User.find(cognito_external_id, self.class)
     end
 
     protected

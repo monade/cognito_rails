@@ -49,9 +49,9 @@ module CognitoRails
     # @param user_class [nil,Object]
     # @return [CognitoRails::User]
     def self.find(id, user_class = nil)
-      result = cognito_client.admin_get_user(
+      result = cognito_client_for(user_class).admin_get_user(
         {
-          user_pool_id: CognitoRails::Config.aws_user_pool_id, # required
+          user_pool_id: user_pool_id_for(user_class), # required
           username: id # required
         }
       )
@@ -62,8 +62,8 @@ module CognitoRails
       user
     end
 
-    def self.all
-      cognito_client.list_users(user_pool_id: CognitoRails::Config.aws_user_pool_id)
+    def self.all(user_class = nil)
+      cognito_client_for(user_class).list_users(user_pool_id: user_pool_id_for(user_class))
     end
 
     # @param attributes [Hash]
@@ -127,7 +127,7 @@ module CognitoRails
 
       cognito_client.admin_delete_user(
         {
-          user_pool_id: CognitoRails::Config.aws_user_pool_id,
+          user_pool_id: user_pool_id,
           username: id
         }
       )
@@ -142,11 +142,28 @@ module CognitoRails
       destroy || (raise ActiveRecord::RecordInvalid, self)
     end
 
+    # @return [String]s
+    def self.user_pool_id_for(user_class)
+      user_class&._cognito_aws_user_pool_id || CognitoRails::Config.aws_user_pool_id
+    end
+
     # @return [Aws::CognitoIdentityProvider::Client]
     # @raise [RuntimeError]
     def self.cognito_client
       @cognito_client ||= Aws::CognitoIdentityProvider::Client.new(
         { region: CognitoRails::Config.aws_region }.merge(CognitoRails::Config.aws_client_credentials)
+      )
+    end
+
+    def self.cognito_client_for(user_class)
+      model_credentials = user_class&._cognito_aws_client_credentials
+      return cognito_client if model_credentials.nil?
+
+      credentials = model_credentials.to_h
+      cache_key = [CognitoRails::Config.aws_region, credentials.sort_by { |key, _| key.to_s }]
+      @cognito_clients ||= {}
+      @cognito_clients[cache_key] ||= Aws::CognitoIdentityProvider::Client.new(
+        { region: CognitoRails::Config.aws_region }.merge(credentials)
       )
     end
 
@@ -156,9 +173,13 @@ module CognitoRails
 
     private
 
+    def user_pool_id
+      self.class.user_pool_id_for(user_class)
+    end
+
     # @return [Aws::CognitoIdentityProvider::Client]
     def cognito_client
-      self.class.cognito_client
+      self.class.cognito_client_for(user_class)
     end
 
     # @return [Boolean]
@@ -205,7 +226,7 @@ module CognitoRails
     def set_user_provided_password
       cognito_client.admin_set_user_password(
         {
-          user_pool_id: CognitoRails::Config.aws_user_pool_id,
+          user_pool_id: user_pool_id,
           username: email,
           password: password,
           permanent: true
@@ -216,7 +237,7 @@ module CognitoRails
     def save_for_create
       resp = cognito_client.admin_create_user(
         {
-          user_pool_id: CognitoRails::Config.aws_user_pool_id,
+          user_pool_id: user_pool_id,
           username: email,
           user_attributes: [
             *general_user_attributes,
@@ -234,7 +255,7 @@ module CognitoRails
     def save_for_update
       cognito_client.admin_update_user_attributes(
         {
-          user_pool_id: CognitoRails::Config.aws_user_pool_id,
+          user_pool_id: user_pool_id,
           username: id,
           user_attributes: [
             *general_user_attributes

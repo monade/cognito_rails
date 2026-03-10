@@ -26,7 +26,7 @@ RSpec.describe CognitoRails::User, type: :model do
   end
 
   it 'finds a user with admin class' do
-    expect(described_class).to receive(:cognito_client).and_return(fake_cognito_client)
+    allow(Aws::CognitoIdentityProvider::Client).to receive(:new).and_return(fake_cognito_client)
 
     record = described_class.find(sample_cognito_id, Admin)
     expect(record.user_class).to eq(Admin)
@@ -208,7 +208,21 @@ RSpec.describe CognitoRails::User, type: :model do
 
   context 'admin' do
     before do
-      expect(CognitoRails::User).to receive(:cognito_client).at_least(:once).and_return(fake_cognito_client)
+      allow(CognitoRails::User).to receive(:cognito_client).and_return(fake_cognito_client)
+      allow(Aws::CognitoIdentityProvider::Client).to receive(:new).and_return(fake_cognito_client)
+      CognitoRails::User.instance_variable_set(:@cognito_clients, nil)
+    end
+
+    it 'uses model aws_credentials if present' do
+      Admin.create!(email: sample_cognito_email, phone: '12345678')
+
+      expect(Aws::CognitoIdentityProvider::Client).to have_received(:new).with(
+        hash_including(
+          region: CognitoRails::Config.aws_region,
+          access_key_id: 'admin_access_key_id',
+          secret_access_key: 'admin_secret_access_key'
+        )
+      )
     end
 
     it '#find_by_cognito' do
