@@ -35,13 +35,13 @@ module CognitoRails
     # @option attributes [String, nil] :password
     # @option attributes [String, nil] :phone
     # @option attributes [Array<Hash>, nil] :custom_attributes
-    # @option attributes [Class, nil] :user_class
+    # @option attributes [String,Symbol,Class, nil] :user_class
     def initialize(attributes = {})
       attributes = attributes.with_indifferent_access
       self.email = attributes[:email]
       self.password = attributes[:password] || Config.password_generator.call
       self.phone = attributes[:phone]
-      self.user_class = attributes[:user_class] || Config.default_user_class.constantize
+      self.user_class = self.class.resolve_user_class(attributes[:user_class]) || Config.default_user_class.constantize
       self.custom_attributes = attributes[:custom_attributes]
     end
 
@@ -144,6 +144,7 @@ module CognitoRails
 
     # @return [String]s
     def self.user_pool_id_for(user_class)
+      user_class = resolve_user_class(user_class)
       user_class&._cognito_aws_user_pool_id || CognitoRails::Config.aws_user_pool_id
     end
 
@@ -154,6 +155,7 @@ module CognitoRails
     end
 
     def self.cognito_client_for(user_class)
+      user_class = resolve_user_class(user_class)
       model_credentials = user_class&._cognito_aws_client_credentials
       return cognito_client if model_credentials.nil?
 
@@ -161,6 +163,7 @@ module CognitoRails
     end
 
     def self.cognito_region_for(user_class = nil)
+      user_class = resolve_user_class(user_class)
       credentials = user_class&._cognito_aws_client_credentials
       credentials = CognitoRails::Config.aws_client_credentials if credentials.nil?
 
@@ -183,6 +186,19 @@ module CognitoRails
       region = credentials.delete(:region) || CognitoRails::Config.aws_region
 
       { region: region }.merge(credentials).with_indifferent_access
+    end
+
+    # @param user_class [String,Symbol,Class,nil]
+    # @return [Class,nil]
+    def self.resolve_user_class(user_class)
+      case user_class
+      when nil
+        nil
+      when String, Symbol
+        user_class.to_s.constantize
+      else
+        user_class
+      end
     end
 
     private

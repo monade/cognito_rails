@@ -32,6 +32,14 @@ RSpec.describe CognitoRails::User, type: :model do
     expect(record.user_class).to eq(Admin)
   end
 
+  it 'finds a user with admin class passed as string' do
+    allow(Aws::CognitoIdentityProvider::Client).to receive(:new).and_return(fake_cognito_client)
+    described_class.instance_variable_set(:@cognito_clients, nil)
+
+    record = described_class.find(sample_cognito_id, 'Admin')
+    expect(record.user_class).to eq(Admin)
+  end
+
   it 'finds a user with default class' do
     expect(described_class).to receive(:cognito_client).and_return(fake_cognito_client)
 
