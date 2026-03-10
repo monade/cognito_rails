@@ -218,11 +218,17 @@ RSpec.describe CognitoRails::User, type: :model do
 
       expect(Aws::CognitoIdentityProvider::Client).to have_received(:new).with(
         hash_including(
-          region: CognitoRails::Config.aws_region,
+          region: 'admin-region',
           access_key_id: 'admin_access_key_id',
           secret_access_key: 'admin_secret_access_key'
         )
       )
+    end
+
+    it 'caches clients by region and credentials' do
+      expect(Aws::CognitoIdentityProvider::Client).to receive(:new).once.and_return(fake_cognito_client)
+
+      2.times { Admin.create!(email: "#{SecureRandom.uuid}@mail.com", phone: SecureRandom.hex(5)) }
     end
 
     it '#find_by_cognito' do

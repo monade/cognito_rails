@@ -78,6 +78,7 @@ class Admin < ApplicationRecord
   as_cognito_user(
     user_pool_id: 'admin_pool_id',
     aws_credentials: {
+      region: 'eu-west-1',
       access_key_id: 'admin_key',
       secret_access_key: 'admin_secret'
     }
@@ -89,7 +90,9 @@ end
 `cognito_verify_email` and `cognito_verify_phone` add email and phone verification on user creation.
 `cognito_password_policy` chose the password policy on user creation (:temporary, :user_provided), the default is :temporary
 `define_cognito_attribute` assign a custom Cognito attribute to the user. **This won't work if you don't add the custom attribute through the Cognito console in advance**
-`aws_credentials` in `as_cognito_user` is optional and overrides global credentials for that model only. If omitted, global `CognitoRails::Config.aws_client_credentials` is used.
+`aws_credentials` in `as_cognito_user` is optional and overrides global AWS settings for that model.
+If `region` is not provided in `aws_credentials`, it falls back to `CognitoRails::Config.aws_region`.
+If `aws_credentials` is omitted, global `CognitoRails::Config.aws_client_credentials` is used.
 
 ## License
 

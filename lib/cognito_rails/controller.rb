@@ -22,13 +22,17 @@ module CognitoRails
     # @return [ActiveRecord::Base,nil]
     def cognito_user_for(attribute)
       attribute = attribute.to_sym
-      return unless external_cognito_id
+      return unless external_cognito_id(attribute)
 
       user_klass = cognito_user_klass(attribute)
       return unless user_klass
 
       ivar = "@#{attribute}"
-      instance_variable_get(ivar) || instance_variable_set(ivar, user_klass.find_by_cognito(external_cognito_id))
+      var = instance_variable_get(ivar)
+      return var if var
+
+      klass = user_klass.find_by_cognito(external_cognito_id(attribute))
+      instance_variable_set(ivar, klass)
     end
 
     private
@@ -71,13 +75,17 @@ module CognitoRails
     end
 
     # @return [String,nil] cognito user id
-    def external_cognito_id
+    def external_cognito_id(attribute = :current_user)
       # @type [String,nil]
       token = request.headers['Authorization']&.split(' ')&.last
 
       return unless token
 
-      CognitoRails::JWT.decode(token)&.dig(0, 'sub')
+      user_class = cognito_user_klass(attribute)
+      user_pool_id = user_class&._cognito_aws_user_pool_id || CognitoRails::Config.aws_user_pool_id
+      aws_region = CognitoRails::User.cognito_region_for(user_class)
+      jwt_payload = CognitoRails::JWT.decode(token, user_pool_id: user_pool_id, aws_region: aws_region)
+      jwt_payload&.dig(0, 'sub')
     end
   end
 end

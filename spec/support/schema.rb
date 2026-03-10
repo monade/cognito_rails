@@ -39,6 +39,7 @@ class Admin < ActiveRecord::Base
   as_cognito_user(
     attribute_name: 'cognito_id',
     aws_credentials: {
+      region: 'admin-region',
       access_key_id: 'admin_access_key_id',
       secret_access_key: 'admin_secret_access_key'
     }

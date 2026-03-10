@@ -150,25 +150,39 @@ module CognitoRails
     # @return [Aws::CognitoIdentityProvider::Client]
     # @raise [RuntimeError]
     def self.cognito_client
-      @cognito_client ||= Aws::CognitoIdentityProvider::Client.new(
-        { region: CognitoRails::Config.aws_region }.merge(CognitoRails::Config.aws_client_credentials)
-      )
+      cognito_client_for_credentials(CognitoRails::Config.aws_client_credentials)
     end
 
     def self.cognito_client_for(user_class)
       model_credentials = user_class&._cognito_aws_client_credentials
       return cognito_client if model_credentials.nil?
 
-      credentials = model_credentials.to_h
-      cache_key = [CognitoRails::Config.aws_region, credentials.sort_by { |key, _| key.to_s }]
+      cognito_client_for_credentials(model_credentials)
+    end
+
+    def self.cognito_region_for(user_class = nil)
+      credentials = user_class&._cognito_aws_client_credentials
+      credentials = CognitoRails::Config.aws_client_credentials if credentials.nil?
+
+      credentials.with_indifferent_access[:region] || CognitoRails::Config.aws_region
+    end
+
+    def self.cognito_client_for_credentials(credentials)
+      client_options = cognito_client_options(credentials)
+      cache_key = client_options.sort_by { |key, _| key.to_s }
       @cognito_clients ||= {}
-      @cognito_clients[cache_key] ||= Aws::CognitoIdentityProvider::Client.new(
-        { region: CognitoRails::Config.aws_region }.merge(credentials)
-      )
+      @cognito_clients[cache_key] ||= Aws::CognitoIdentityProvider::Client.new(client_options)
     end
 
     def self.extract_cognito_attribute(attributes, column)
       attributes.find { |attribute| attribute[:name] == column.to_s }&.dig(:value)
+    end
+
+    def self.cognito_client_options(credentials)
+      credentials = credentials.with_indifferent_access
+      region = credentials.delete(:region) || CognitoRails::Config.aws_region
+
+      { region: region }.merge(credentials).with_indifferent_access
     end
 
     private
