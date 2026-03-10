@@ -22,7 +22,8 @@ module CognitoRails
     # @return [ActiveRecord::Base,nil]
     def cognito_user_for(attribute)
       attribute = attribute.to_sym
-      return unless external_cognito_id(attribute)
+      external_id = external_cognito_id(attribute)
+      return unless external_id
 
       user_klass = cognito_user_klass(attribute)
       return unless user_klass
@@ -31,8 +32,8 @@ module CognitoRails
       var = instance_variable_get(ivar)
       return var if var
 
-      klass = user_klass.find_by_cognito(external_cognito_id(attribute))
-      instance_variable_set(ivar, klass)
+      user = user_klass.find_by_cognito(external_id)
+      instance_variable_set(ivar, user)
     end
 
     private

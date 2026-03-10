@@ -45,16 +45,20 @@ module CognitoRails
       self.custom_attributes = attributes[:custom_attributes]
     end
 
-    # @param id [String]
-    # @param user_class [nil,Object]
-    # @return [CognitoRails::User]
-    def self.find(id, user_class = nil)
-      result = cognito_client_for(user_class).admin_get_user(
+    def self.find_raw(id, user_class = nil)
+      cognito_client_for(user_class).admin_get_user(
         {
           user_pool_id: user_pool_id_for(user_class), # required
           username: id # required
         }
       )
+    end
+
+    # @param id [String]
+    # @param user_class [nil,Object]
+    # @return [CognitoRails::User]
+    def self.find(id, user_class = nil)
+      result = find_raw(id, user_class)
       user = new(user_class: user_class)
       user.id = result.username
       user.email = extract_cognito_attribute(result.user_attributes, :email)
