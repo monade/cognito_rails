@@ -58,20 +58,7 @@ module CognitoRails
       @cognito_user_klasses[attribute] ||= begin
         user_class = self.class._cognito_user_classes[attribute]
         user_class ||= CognitoRails::Config.default_user_class
-        resolve_user_class(user_class)
-      end
-    end
-
-    # @param user_class [String,Symbol,Class,nil]
-    # @return [Class,nil]
-    def resolve_user_class(user_class)
-      case user_class
-      when nil
-        nil
-      when String, Symbol
-        user_class.to_s.constantize
-      else
-        user_class
+        CognitoRails::Utils.resolve_model_class(user_class)
       end
     end
 
@@ -83,8 +70,9 @@ module CognitoRails
       return unless token
 
       user_class = cognito_user_klass(attribute)
-      user_pool_id = user_class&._cognito_aws_user_pool_id || CognitoRails::Config.aws_user_pool_id
-      aws_region = CognitoRails::User.cognito_region_for(user_class)
+      scope = CognitoRails::User.with_credentials(user_class)
+      user_pool_id = scope.user_pool_id
+      aws_region = scope.aws_region
       jwt_payload = CognitoRails::JWT.decode(token, user_pool_id: user_pool_id, aws_region: aws_region)
       jwt_payload&.dig(0, 'sub')
     end

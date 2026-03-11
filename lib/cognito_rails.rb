@@ -17,6 +17,7 @@ module CognitoRails
   autoload :User
   autoload :JWT
   autoload :PasswordGenerator
+  autoload :Utils
 
   # @private
   module ModelInitializer
@@ -29,6 +30,18 @@ module CognitoRails
       self._cognito_attribute_name = attribute_name
       self._cognito_aws_user_pool_id = user_pool_id
       self._cognito_aws_client_credentials = aws_credentials
+
+      credentials = (aws_credentials || {}).with_indifferent_access
+
+      CognitoRails::Config.register_user_scope(
+        self,
+        {
+          user_pool_id: user_pool_id,
+          aws_region: credentials[:region],
+          access_key_id: credentials[:access_key_id],
+          secret_access_key: credentials[:secret_access_key]
+        }
+      )
     end
   end
 
@@ -47,7 +60,5 @@ module CognitoRails
   end
 end
 
-# rubocop:disable Lint/SendWithMixinArgument
-ActiveRecord::Base.send(:extend, CognitoRails::ModelInitializer)
-ActionController::Metal.send(:extend, CognitoRails::ControllerInitializer)
-# rubocop:enable Lint/SendWithMixinArgument
+ActiveRecord::Base.extend CognitoRails::ModelInitializer
+ActionController::Metal.extend CognitoRails::ControllerInitializer
