@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project made by Monade Team are documented in this file. For info refer to team@monade.io
 
+## [1.5.0] - 2026-03-12
+### Added
+- Handle multiple Cognito user pools
+
 ## [1.4.0] - 2025-01-20
 ### Added
 - Support for Rails 8
