@@ -5,33 +5,76 @@ module CognitoRails
     extend ActiveSupport::Concern
 
     # @scope class
-    # @!attribute _cognito_user_class [rw]
-    #   @return [String,nil] class name of user model
+    # @!attribute _cognito_user_classes [rw]
+    #   @return [Hash{Symbol => String,Class,nil}] user class by attribute
 
     included do
-      class_attribute :_cognito_user_class
+      class_attribute :_cognito_user_classes
+      self._cognito_user_classes = {}
     end
 
     # @return [ActiveRecord::Base,nil]
     def current_user
-      @current_user ||= cognito_user_klass.find_by_cognito(external_cognito_id) if external_cognito_id
+      cognito_user_for(:current_user)
+    end
+
+    # @param attribute [Symbol]
+    # @return [ActiveRecord::Base,nil]
+    def cognito_user_for(attribute)
+      attribute = attribute.to_sym
+      external_id = external_cognito_id(attribute)
+      return unless external_id
+
+      user_klass = cognito_user_klass(attribute)
+      return unless user_klass
+
+      ivar = "@#{attribute}"
+      var = instance_variable_get(ivar)
+      return var if var
+
+      user = user_klass.find_by_cognito(external_id)
+      instance_variable_set(ivar, user)
     end
 
     private
 
+    # Get the useer from the specified attribute, or from the default :current_user if not found
+    module ClassMethods
+      # @param attribute [Symbol]
+      # @return [void]
+      def _cognito_define_user_reader(attribute)
+        return if method_defined?(attribute)
+
+        define_method(attribute) do
+          cognito_user_for(attribute)
+        end
+      end
+    end
+
     # @return [#find_by_cognito]
-    def cognito_user_klass
-      @cognito_user_klass ||= (self.class._cognito_user_class || CognitoRails::Config.default_user_class)&.constantize
+    def cognito_user_klass(attribute = :current_user)
+      attribute = attribute.to_sym
+      @cognito_user_klasses ||= {}
+      @cognito_user_klasses[attribute] ||= begin
+        user_class = self.class._cognito_user_classes[attribute]
+        user_class ||= CognitoRails::Config.default_user_class
+        CognitoRails::Utils.resolve_model_class(user_class)
+      end
     end
 
     # @return [String,nil] cognito user id
-    def external_cognito_id
+    def external_cognito_id(attribute = :current_user)
       # @type [String,nil]
       token = request.headers['Authorization']&.split(' ')&.last
 
       return unless token
 
-      CognitoRails::JWT.decode(token)&.dig(0, 'sub')
+      user_class = cognito_user_klass(attribute)
+      scope = CognitoRails::User.with_credentials(user_class)
+      user_pool_id = scope.user_pool_id
+      aws_region = scope.aws_region
+      jwt_payload = CognitoRails::JWT.decode(token, user_pool_id: user_pool_id, aws_region: aws_region)
+      jwt_payload&.dig(0, 'sub')
     end
   end
 end

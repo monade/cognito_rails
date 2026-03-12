@@ -36,7 +36,14 @@ class Admin < ActiveRecord::Base
   validates :phone, presence: true
   validates :phone, uniqueness: true
 
-  as_cognito_user attribute_name: 'cognito_id'
+  as_cognito_user(
+    attribute_name: 'cognito_id',
+    aws_credentials: {
+      region: 'admin-region',
+      access_key_id: 'admin_access_key_id',
+      secret_access_key: 'admin_secret_access_key'
+    }
+  )
   cognito_verify_email
   cognito_verify_phone
   define_cognito_attribute 'role', 'admin'
