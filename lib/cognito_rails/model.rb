@@ -50,6 +50,13 @@ module CognitoRails
         end
       end
 
+      def sync_from_cognito_id!(external_id)
+        user_data = User.with_credentials(self).find_raw(external_id)
+        sync_user!(user_data) do |user|
+          yield user, user_data if block_given?
+        end
+      end
+
       private
 
       def sync_user!(user_data)
@@ -57,8 +64,9 @@ module CognitoRails
         return if external_id.blank?
 
         user = find_or_initialize_by(_cognito_attribute_name => external_id)
-        user.email = User.extract_cognito_attribute(user_data.attributes, :email)
-        user.phone = User.extract_cognito_attribute(user_data.attributes, :phone_number) if user.respond_to?(:phone)
+        attributes = user_data.respond_to?(:attributes) ? user_data.attributes : user_data.user_attributes
+        user.email = User.extract_cognito_attribute(attributes, :email)
+        user.phone = User.extract_cognito_attribute(attributes, :phone_number) if user.respond_to?(:phone)
         _cognito_resolve_custom_attribute(user, user_data)
 
         yield user if block_given?
@@ -134,7 +142,6 @@ module CognitoRails
 
     def cognito_scope
       @cognito_scope ||= User.with_credentials(self.class)
-
     end
 
     class_methods do

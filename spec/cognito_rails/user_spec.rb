@@ -200,6 +200,18 @@ RSpec.describe CognitoRails::User, type: :model do
       end
     end
 
+    context '#sync_from_cognito_id!' do
+      before do
+        expect(fake_cognito_client).to receive(:admin_get_user)
+          .and_return(build_cognito_user_data(sample_cognito_email))
+      end
+      it 'imports the user correctly' do
+        user = User.sync_from_cognito_id!(sample_cognito_id)
+        expect(user).to be_a(User)
+        expect(user.email).to eq(sample_cognito_email)
+      end
+    end
+
     it '#sync_to_cognito!' do
       User.create!(email: sample_cognito_email)
 

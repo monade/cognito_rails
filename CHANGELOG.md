@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project made by Monade Team are documented in this file. For info refer to team@monade.io
 
+## [1.6.0] - 2026-03-12
+### Added
+- `sync_from_cognito_id!` method to sync a user from Cognito using their external ID
+
 ## [1.5.0] - 2026-03-12
 ### Added
 - Handle multiple Cognito user pools
