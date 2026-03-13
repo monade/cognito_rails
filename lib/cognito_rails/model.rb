@@ -78,8 +78,8 @@ module CognitoRails
       def _cognito_resolve_custom_attribute(user, user_data)
         _cognito_custom_attributes.each do |attribute|
           next if attribute[:value].is_a?(String)
-
-          value = User.extract_cognito_attribute(user_data.attributes, attribute[:name])
+          attributes = user_data.respond_to?(:attributes) ? user_data.attributes : user_data.user_attributes
+          value = User.extract_cognito_attribute(attributes, attribute[:name])
           next unless value
 
           user[attribute[:name].gsub('custom:', '')] = value
