@@ -40,7 +40,8 @@ module CognitoRails::Helpers
     end
   end
 
-  def build_cognito_user_data(email)
+  def build_cognito_user_data(email, external_id: nil)
+    sub = external_id || SecureRandom.uuid
     OpenStruct.new(
       username: SecureRandom.uuid,
       user_status: 'CONFIRMED',
@@ -50,6 +51,10 @@ module CognitoRails::Helpers
         OpenStruct.new(
           name: 'email',
           value: email
+        ),
+        OpenStruct.new(
+          name: 'sub',
+          value: sub
         ),
         OpenStruct.new(
           name: 'custom:name',
