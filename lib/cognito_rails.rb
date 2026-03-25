@@ -25,9 +25,10 @@ module CognitoRails
     # @param user_pool_id [String]
     # @param aws_credentials [Hash,nil]
     # @return [void]
-    def as_cognito_user(attribute_name: 'external_id', user_pool_id: nil, aws_credentials: nil)
+    def as_cognito_user(attribute_name: 'external_id', attribute_type: :username, user_pool_id: nil, aws_credentials: nil)
       send :include, CognitoRails::Model
       self._cognito_attribute_name = attribute_name
+      self._cognito_attribute_type = attribute_type
       self._cognito_aws_user_pool_id = user_pool_id
       self._cognito_aws_client_credentials = aws_credentials
 

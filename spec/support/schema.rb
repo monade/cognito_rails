@@ -63,6 +63,16 @@ class PasswordProvidedUser < ActiveRecord::Base
   attr_accessor :password
 end
 
+class SubAttributeUser < ActiveRecord::Base
+  validates :email, presence: true
+  validates :email, uniqueness: true
+
+  as_cognito_user(attribute_type: :sub)
+  cognito_verify_email
+
+  attr_accessor :password
+end
+
 module Schema
   def self.create
     ActiveRecord::Migration.verbose = false
@@ -93,6 +103,12 @@ module Schema
       create_table :password_provided_users, force: true do |t|
         t.string "email", null: false
         t.string "name"
+        t.string "external_id", null: false
+        t.timestamps null: false
+      end
+
+      create_table :sub_attribute_users, force: true do |t|
+        t.string "email", null: false
         t.string "external_id", null: false
         t.timestamps null: false
       end

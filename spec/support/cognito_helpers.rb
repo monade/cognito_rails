@@ -40,10 +40,9 @@ module CognitoRails::Helpers
     end
   end
 
-  def build_cognito_user_data(email, external_id: nil)
-    sub = external_id || SecureRandom.uuid
+  def build_cognito_user_data(email, username: SecureRandom.uuid, sub: nil)
     OpenStruct.new(
-      username: SecureRandom.uuid,
+      username: username,
       user_status: 'CONFIRMED',
       enabled: true,
       user_last_modified_date: Time.now,
@@ -52,15 +51,12 @@ module CognitoRails::Helpers
           name: 'email',
           value: email
         ),
-        OpenStruct.new(
-          name: 'sub',
-          value: sub
-        ),
+        (sub ? OpenStruct.new(name: 'sub', value: sub) : nil),
         OpenStruct.new(
           name: 'custom:name',
           value: 'John Doe'
         )
-      ],
+      ].compact,
       mfa_options: []
     )
   end

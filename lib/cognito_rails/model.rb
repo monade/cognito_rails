@@ -12,6 +12,7 @@ module CognitoRails
       class_attribute :_cognito_verify_phone
       class_attribute :_cognito_custom_attributes
       class_attribute :_cognito_attribute_name
+      class_attribute :_cognito_attribute_type
       class_attribute :_cognito_password_policy
       class_attribute :_cognito_aws_user_pool_id
       class_attribute :_cognito_aws_client_credentials
@@ -62,7 +63,7 @@ module CognitoRails
       def sync_user!(user_data)
         attributes = user_data.respond_to?(:attributes) ? user_data.attributes : user_data.user_attributes
 
-        external_id = User.extract_cognito_attribute(attributes, :sub)
+        external_id = _cognito_resolve_attribute_type(user_data)
         return if external_id.blank?
 
         user = find_or_initialize_by(_cognito_attribute_name => external_id)
@@ -74,6 +75,19 @@ module CognitoRails
 
         user.save!
         user
+      end
+
+      def _cognito_resolve_attribute_type(user_data)
+        attributes = user_data.respond_to?(:attributes) ? user_data.attributes : user_data.user_attributes
+
+        case _cognito_attribute_type
+        when :username
+          user_data.username
+        when :sub
+          User.extract_cognito_attribute(attributes, :sub)
+        else
+          raise "Unsupported attribute type: #{_cognito_attribute_type}"
+        end
       end
 
       def _cognito_resolve_custom_attribute(user, user_data)
