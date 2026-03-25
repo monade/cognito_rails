@@ -156,7 +156,7 @@ RSpec.describe CognitoRails::User, type: :model do
 
     context '#sync_from_cognito!' do
       before do
-        expect(fake_cognito_client).to receive(:list_users).and_return(
+        allow(fake_cognito_client).to receive(:list_users).and_return(
           OpenStruct.new(
             users: [
               build_cognito_user_data('some@example.com'),
@@ -177,6 +177,40 @@ RSpec.describe CognitoRails::User, type: :model do
 
         expect(User.pluck(:email)).to match_array(['some@example.com', 'some2@example.com'])
         expect(User.pluck(:name)).to match_array(['John Doe', 'John Doe'])
+      end
+
+      it 'resolves external_id from username when attribute_type is :username' do
+        allow(fake_cognito_client).to receive(:list_users).and_return(
+          OpenStruct.new(
+            users: [
+              build_cognito_user_data('u1@example.com', username: 'username-1'),
+              build_cognito_user_data('u2@example.com', username: 'username-2')
+            ],
+            pagination_token: nil
+          )
+        )
+
+        expect do
+          users = User.sync_from_cognito!
+          expect(users.map(&:external_id)).to match_array(%w[username-1 username-2])
+        end.to change { User.count }.by(2)
+      end
+
+      it 'resolves external_id from sub when attribute_type is :sub' do
+        allow(fake_cognito_client).to receive(:list_users).and_return(
+          OpenStruct.new(
+            users: [
+              build_cognito_user_data('s1@example.com', sub: 'sub-1'),
+              build_cognito_user_data('s2@example.com', sub: 'sub-2')
+            ],
+            pagination_token: nil
+          )
+        )
+
+        expect do
+          users = SubAttributeUser.sync_from_cognito!
+          expect(users.map(&:external_id)).to match_array(%w[sub-1 sub-2])
+        end.to change { SubAttributeUser.count }.by(2)
       end
 
       it 'allows to specify a block with extra changes applied pre-save' do

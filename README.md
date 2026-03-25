@@ -46,12 +46,13 @@ class ApplicationController < ActionController::Base
 end
 
 class Admin::BaseController < ActionController::Base
-  cognito_authentication user_class: 'Admin', attribute_name: :admin_user
+  cognito_authentication user_class: 'Admin', attribute_name: :admin_user, attribute_type: :sub
 end
 ```
 
 This makes the logged user available to your controllers through the current_user attribute.
 If you pass `attribute_name`, the user is exposed through that method name (for example `admin_user`).
+`attribute_type` defines which Cognito attribute should be used. Supported values are :username (default) and :sub.
 
 ### Model
 
